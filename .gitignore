@@ -1,0 +1,40 @@
+# Ignorar a máquina virtual Python
+venv/
+# env/
+*.pyc
+__pycache__/
+
+# Ignorar arquivos de log
+*.log
+
+# Ignorar arquivos temporários do sistema operacional
+.DS_Store
+Thumbs.db
+
+# Ignorar arquivos de configuração do editor
+.vscode/
+.idea/
+
+# Ignorar arquivos de saída
+*.exe
+*.out
+*.class
+
+# Ignorar arquivos de backup
+*.bak
+*.swp
+
+# Ignorar arquivos gerados pelo PyQt5 Designer
+*.ui
+*.qrc
+
+# Ignorar arquivos de documentos gerados
+*.docx
+*.xlsx
+*.pdf
+
+# Ignorar arquivos de notebook Jupyter
+*.ipynb_checkpoints/
+
+*build
+*dist
