@@ -26,8 +26,8 @@ class HapDoc(QMainWindow):
         self.program_hapdoc = QTabWidget()
         self.procedures_package = QWidget()
         self.procedures_package_ = QWidget()
-
-        self.procedure_package_process = None
+        # Instanciando a classe ProcedurePackageProcess
+        self.procedure_package_process = ProcedurePackageProcess(parent=self)
 
         self.createview()
 
@@ -39,6 +39,8 @@ class HapDoc(QMainWindow):
         self.program_hapdoc.addTab(self.procedures_package_, f'{space} Centro Clínico {space}')
         self.program_hapdoc.setDocumentMode(True)
         self.program_hapdoc.setMovable(True)
+        # Criando a aba "Pacote Procedimento"
+        self.procedure_package_process.creat_procedures_and_package_tab(self.procedures_package)
 
 
 # Loop do programa em funcionamento
