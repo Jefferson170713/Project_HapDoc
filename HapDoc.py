@@ -14,20 +14,41 @@ from PyQt5.QtWidgets import QFileDialog
 from PyQt5.QtWidgets import QMessageBox
 from PyQt5.QtWidgets import QVBoxLayout
 from PyQt5.QtWidgets import QWidget
+from ProcedurePackageProcess import ProcedurePackageProcess
 
+# Classe principal da aplicação
 class HapDoc(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("HapDoc")
         self.setGeometry(100, 100, 600, 300)
         self.setWindowIcon(QIcon("./ARQUIVOS/logo/logo.ico"))
+        self.program_hapdoc = QTabWidget()
+        self.procedures_package = QWidget()
+        self.procedures_package_ = QWidget()
 
+        self.procedure_package_process = None
+
+        self.createview()
+
+    # Função para criar as abas do programa
+    def createview(self):
+        space = 5 * ' '
+        self.setCentralWidget(self.program_hapdoc)
+        self.program_hapdoc.addTab(self.procedures_package, f'{space} Pacote Procedimento {space}')
+        self.program_hapdoc.addTab(self.procedures_package_, f'{space} Centro Clínico {space}')
+        self.program_hapdoc.setDocumentMode(True)
+        self.program_hapdoc.setMovable(True)
+
+
+# Loop do programa em funcionamento
 def main():
     app = QApplication(sys.argv)
     window = HapDoc()
     window.show()
     sys.exit(app.exec_())
 
+# Verifica se o arquivo é executado diretamente
 if __name__ == "__main__":
     main()
         
