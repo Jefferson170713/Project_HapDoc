@@ -14,7 +14,9 @@ from PyQt5.QtWidgets import QFileDialog
 from PyQt5.QtWidgets import QMessageBox
 from PyQt5.QtWidgets import QVBoxLayout
 from PyQt5.QtWidgets import QWidget
-from ProcedurePackageProcess import ProcedurePackageProcess
+#from ProcedurePackageProcess import ProcedurePackageProcess
+from WindowProcedurePackage import WindowProcedurePackage
+
 
 # Classe principal da aplicação
 class HapDoc(QMainWindow):
@@ -27,7 +29,7 @@ class HapDoc(QMainWindow):
         self.procedures_package = QWidget()
         self.procedures_package_ = QWidget()
         # Instanciando a classe ProcedurePackageProcess
-        self.procedure_package_process = ProcedurePackageProcess(parent=self)
+        self.procedure_package_process = WindowProcedurePackage(parent=self)
 
         self.createview()
 
@@ -40,7 +42,7 @@ class HapDoc(QMainWindow):
         self.program_hapdoc.setDocumentMode(True)
         self.program_hapdoc.setMovable(True)
         # Criando a aba "Pacote Procedimento"
-        self.procedure_package_process.creat_procedures_and_package_tab(self.procedures_package)
+        self.procedure_package_process.create_procedures_and_package_tab(self.procedures_package)
 
 
 # Loop do programa em funcionamento
