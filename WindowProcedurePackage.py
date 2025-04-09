@@ -1,3 +1,4 @@
+import pandas as pd
 from PyQt5.QtWidgets import QVBoxLayout
 from PyQt5.QtWidgets import QLabel
 from PyQt5.QtWidgets import QPushButton
@@ -5,28 +6,27 @@ from PyQt5.QtWidgets import QTextEdit
 from PyQt5.QtWidgets import QFrame
 from PyQt5.QtWidgets import QFileDialog
 from PyQt5.QtWidgets import QMessageBox
+from PyQt5.QtWidgets import QHBoxLayout
 from ProcedurePackageProcess import ProcedurePackageProcess
 
 class WindowProcedurePackage:
     def __init__(self, parent=None):
         self.parent = parent
         self.file_path = None
-        self.model_path = "./modelo_cod_renomeacao.csv"
-        self.sigo_path = "./ARQUIVOS/de_para_sigo.csv"
+        self.model_path = None
+        self.sigo_path = None
         self.output_path = None
+        self.df = pd.DataFrame()
+        self.df_model = pd.DataFrame()
+        self.df_sigo = pd.DataFrame()
+        self.df_final = pd.DataFrame()
     
-    # Criar a aba de "Pacote Procedimento"
     def create_procedures_and_package_tab(self, procedures_package):
         layout_procedures_package = QVBoxLayout()
 
         # QLabel para exibir o status do arquivo
         self.label_status = QLabel("Nenhum arquivo carregado.")
         layout_procedures_package.addWidget(self.label_status)
-
-        # Botão para selecionar o arquivo principal
-        btn_select_file = QPushButton("Selecionar Arquivo")
-        btn_select_file.clicked.connect(self.select_file)
-        layout_procedures_package.addWidget(btn_select_file)
 
         # QTextEdit para exibir informações do arquivo carregado
         self.text_edit_info = QTextEdit()
@@ -39,10 +39,26 @@ class WindowProcedurePackage:
         separator.setFrameShadow(QFrame.Sunken)
         layout_procedures_package.addWidget(separator)
 
+        # Layout horizontal para os botões
+        button_layout = QHBoxLayout()
+
+        # Botão para selecionar o arquivo principal
+        btn_select_file = QPushButton("Selecionar Arquivo")
+        btn_select_file.setFixedSize(150, 35) 
+        btn_select_file.clicked.connect(self.select_file)
+        button_layout.addWidget(btn_select_file)
+
+        # Adiciona um espaço expansível entre os botões
+        button_layout.addStretch()
+
         # Botão para processar e salvar o arquivo
         btn_process_save = QPushButton("Processar e Salvar")
+        btn_process_save.setFixedSize(150, 35)
         btn_process_save.clicked.connect(self.process_and_save)
-        layout_procedures_package.addWidget(btn_process_save)
+        button_layout.addWidget(btn_process_save)
+
+        # Adiciona o layout horizontal ao layout vertical principal
+        layout_procedures_package.addLayout(button_layout)
 
         # Configurando o layout na aba
         procedures_package.setLayout(layout_procedures_package)
@@ -50,10 +66,26 @@ class WindowProcedurePackage:
     # Função para selecionar o arquivo principal
     def select_file(self):
         file_path, _ = QFileDialog.getOpenFileName(self.parent, "Selecionar Arquivo", "", "Arquivos CSV (*.csv)")
+        # Preciso puxar aqui a função de ProcedurePackageProcess 1. load_data
         if file_path:
             self.file_path = file_path
-            self.label_status.setText(f"Arquivo carregado: {file_path}")
-            self.text_edit_info.setText(f"Arquivo selecionado:\n{file_path}")
+            # Pegando a última parte do caminho do arquivo
+            split_file = file_path.split("/")[-1]
+            # Instanciar ProcedurePackageProcess e carregar os dados
+            try:
+                procedure_processor = ProcedurePackageProcess(parent=self.parent)
+                # Define o caminho do arquivo
+                procedure_processor.file_path = self.file_path 
+                # Carrega os dados e armazena os DataFrames
+                self.df, self.df_cod, self.df_sigo = procedure_processor.load_data()
+                #procedure_processor.load_data()  # Chama a função para carregar os dados
+                #self.label_status.setText(f"Arquivo carregado e processado: {split_file}")
+            except Exception as erro:
+                QMessageBox.critical(self.parent, "Erro", f"Erro ao carregar o arquivo:\n{str(erro)} \n1 - Verifique o formato do arquivo. \n2 - O arquivo deve ser um CSV \n3 - Ou as Colunas desajustadas!!!")
+
+            self.label_status.setText(f"Arquivo carregado: {split_file}")
+            self.text_edit_info.setText(f"Arquivo selecionado:\n{split_file}")
+
         else:
             self.label_status.setText("Nenhum arquivo carregado.")
             self.text_edit_info.clear()

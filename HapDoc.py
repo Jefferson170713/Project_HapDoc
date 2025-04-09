@@ -14,7 +14,6 @@ from PyQt5.QtWidgets import QFileDialog
 from PyQt5.QtWidgets import QMessageBox
 from PyQt5.QtWidgets import QVBoxLayout
 from PyQt5.QtWidgets import QWidget
-#from ProcedurePackageProcess import ProcedurePackageProcess
 from WindowProcedurePackage import WindowProcedurePackage
 
 
@@ -37,7 +36,7 @@ class HapDoc(QMainWindow):
     def createview(self):
         space = 5 * ' '
         self.setCentralWidget(self.program_hapdoc)
-        self.program_hapdoc.addTab(self.procedures_package, f'{space} Pacote Procedimento {space}')
+        self.program_hapdoc.addTab(self.procedures_package, f'{space} Pacotes e Procedimentos {space}')
         self.program_hapdoc.addTab(self.procedures_package_, f'{space} Centro Clínico {space}')
         self.program_hapdoc.setDocumentMode(True)
         self.program_hapdoc.setMovable(True)

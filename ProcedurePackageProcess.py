@@ -1,28 +1,26 @@
 import pandas as pd
 import numpy as np
 from pandas import ExcelWriter
-# from PyQt5.QtWidgets import QVBoxLayout
-# from PyQt5.QtWidgets import QLabel
-# from PyQt5.QtWidgets import QPushButton
-# from PyQt5.QtWidgets import QTextEdit
-# from PyQt5.QtWidgets import QFrame
-# from PyQt5.QtWidgets import QFileDialog
-# from PyQt5.QtWidgets import QMessageBox
-
+import os
 class ProcedurePackageProcess:
     def __init__(self, parent=None):
         self.parent = parent
         self.file_path = None
-        self.model_path = "./modelo_cod_renomeacao.csv"
+        self.model_path = "./ARQUIVOS/modelo_cod_renomeacao.csv"
         self.sigo_path = "./ARQUIVOS/de_para_sigo.csv"
         self.output_path = None
+        self.df = pd.DataFrame()
+        self.df_cod = pd.DataFrame()
+        self.df_sigo = pd.DataFrame()
+        self.df_filtered = pd.DataFrame()
+        self.df_final = pd.DataFrame()
 
 
     # 1. Função para ler o arquivo principal e os arquivos auxiliares
     def load_data(self):
         # 1.2 - Lendo o arquivo principal 
-        print(f'Estapa - 1. Função para ler o arquivo principal e os arquivos auxiliares')
-        print(f'Estapa - 1.2 - Lendo o arquivo principal')
+        print(f'ETAPA - 1. Função para ler o arquivo principal e os arquivos auxiliares')
+        print(f'ETAPA - 1.2 - Lendo o arquivo principal')
         self.df = pd.read_csv(self.file_path, sep=';', encoding='latin1', low_memory=False)
         print(f'Colunas de self.df : {self.df.columns}')
         print(f'Quantidade de linhas e colunas self.df: {self.df.shape}')
@@ -31,7 +29,7 @@ class ProcedurePackageProcess:
         self.df['CD_SERVIÇO_HONORARIO'] = self.df['CD_SERVIÇO_HONORARIO'].astype(str).str.replace('.0', '').str.zfill(8)
         self.df['CD_PROCEDIMENTO_TUSS'] = self.df['CD_PROCEDIMENTO_TUSS'].astype(str).str.replace('.0', '')
         self.df['CD_TIPO_ACOMODACAO'] = self.df['CD_TIPO_ACOMODACAO'].astype(str).str.replace('.0', '')
-        print(f'Etapa - 1.2 - Concluida')
+        print(f'ETAPA - 1.2 - Concluida')
         # 1.3 - Lendo o arquivo df_cod
         print(f'ETAPA - 1.3 - Lendo o arquivo df_cod')
         self.df_cod = pd.read_csv(self.model_path, sep=';', encoding='latin1', low_memory=False)
@@ -39,14 +37,16 @@ class ProcedurePackageProcess:
         self.df_cod['CD_SERVIÇO_HONORARIO'] = self.df_cod['CD_SERVIÇO_HONORARIO'].astype(str).str.replace('.0', '').str.zfill(8)
         print(f'Colunas de self.df_cod : {self.df_cod.columns}')
         print(f'Quantidade de linhas e colunas self.df_cod: {self.df_cod.shape}')
-        print(f'Estapa - 1.3 - Concluida')
+        print(f'ETAPA - 1.3 - Concluida')
         # Lendo o arquivo SIGO
-        print(f'Estapa - 1.4 - Lendo o arquivo SIGO')
+        print(f'ETAPA - 1.4 - Lendo o arquivo SIGO')
         self.df_sigo = pd.read_csv(self.sigo_path, sep=';', encoding='latin1', low_memory=False)
         self.df_sigo['ANO_TABELA'] = self.df_sigo['ANO_TABELA'].astype(str).str.replace('.0', '').str.zfill(8)
         print(f'Colunas de self.df_sigo : {self.df_sigo.columns}')
         print(f'Quantidade de linhas e colunas self.df_sigo: {self.df_sigo.shape}')
-        print(f'Estapa - 1.4 - Concluida')
+        print(f'ETAPA - 1.4 - Concluida')
+
+        return self.df, self.df_cod, self.df_sigo
 
     # 2. - Processando as colunas do arquivo principal
     def process_data(self):
@@ -59,7 +59,7 @@ class ProcedurePackageProcess:
             'CONSULTA_HONORARIO', 'ANESTESISTA', 'AUXILIAR', 'CD_TIPO_REDE'
         ]
         self.df_filtered = self.df[columns_selects].copy()
-        print(f'Estapa - 2.1 - Concluida')
+        print(f'ETAPA - 2.1 - Concluida')
 
         # 2.2 - Criamos um dicionário para mapear as chaves de busca e trazer os valores do item *`1.4`*.
         print(f'Etapa - 2.2 - Criamos um dicionário para mapear as chaves de busca e trazer os valores do item *`1.4`*.')
@@ -80,7 +80,7 @@ class ProcedurePackageProcess:
         self.df_filtered.reset_index(drop=True, inplace=True)
         print(f'Quantidade de linhas e Colunas de self.df_filtered : {self.df_filtered.shape}')
         print(f'Colunas de self.df_filtered: {self.df_filtered.columns}')
-        print(f'Estapa - 2.4 - Concluída')
+        print(f'ETAPA - 2.4 - Concluída')
 
     def save_to_excel(self):
         # Salvando os dados processados em um arquivo Excel
