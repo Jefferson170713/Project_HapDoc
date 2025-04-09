@@ -1,18 +1,10 @@
 import sys
-from itertools import permutations
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtWidgets import QMainWindow
 from PyQt5.QtWidgets import QTabWidget
 from PyQt5.QtWidgets import QWidget
-from PyQt5.QtWidgets import QVBoxLayout
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QHBoxLayout
-from PyQt5.QtWidgets import QHBoxLayout
-from PyQt5.QtWidgets import QPushButton
-from PyQt5.QtWidgets import QFrame
-from PyQt5.QtWidgets import QFileDialog
-from PyQt5.QtWidgets import QMessageBox
-from PyQt5.QtWidgets import QVBoxLayout
+
 from PyQt5.QtWidgets import QWidget
 from WindowProcedurePackage import WindowProcedurePackage
 

@@ -85,8 +85,8 @@ class ProcedurePackageProcess:
         print(f'Eatapa - 2.4 - Substituindo os valores em df com base no dicionário.')
         self.df_filtered['NOMENCLATURA'] = np.where(
             self.df_filtered['CD_SERVIÇO_HONORARIO'].isin(self.df_cod['CD_SERVIÇO_HONORARIO']),
-            self.df_filtered['NM_PROCEDIMENTO_TUSS'],
-            self.df_filtered['NM_SERV_HONORARIO']
+            self.df_filtered['NM_SERV_HONORARIO'], # NM_PROCEDIMENTO_TUSS
+            self.df_filtered['NM_PROCEDIMENTO_TUSS'] # NM_SERV_HONORARIO
         )
         # Removendo duplicatas
         self.df_filtered.drop_duplicates(inplace=True)
