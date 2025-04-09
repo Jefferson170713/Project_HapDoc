@@ -46,10 +46,13 @@ class ProcedurePackageProcess:
         print(f'Quantidade de linhas e colunas self.df_sigo: {self.df_sigo.shape}')
         print(f'ETAPA - 1.4 - Concluida')
 
+        # executando a função 2
+        self.process_data_one()
+
         return self.df, self.df_cod, self.df_sigo
 
     # 2. - Processando as colunas do arquivo principal
-    def process_data(self):
+    def process_data_one(self):
         # 2.1 - Selecionando as (12) colunas que usaremos.
         print(f'Etapa - 2 - Processando as colunas do arquivo principal')
         print(f'Etapa - 2.1 - Selecionando as (12) colunas que usaremos')
@@ -67,7 +70,13 @@ class ProcedurePackageProcess:
         print(f'Etapa - 2.2 - Concluida')
         # 2.3 - Criamos um dicionário para mapear as chaves de busca e trazer os valores do item *`1.4`*.
         print(f'Eatapa - 2.3 - Criamos um dicionário para mapear as chaves de busca e trazer os valores do item *`1.4`*.')
-        self.df_filtered['ANO_TABELA'] = self.df_filtered['ANO_TABELA'].map(map_dict).fillna(self.df_filtered['ANO_TABELA'])
+        self.df_filtered['ANO_TABELA'] = (
+            self.df_filtered['ANO_TABELA']
+            .map(map_dict)
+            .fillna(self.df_filtered['ANO_TABELA'])
+            .infer_objects(copy=False)  # Ajusta os tipos de dados explicitamente
+        )
+        print(f'ETAPA - 2.3 - Concluída')
 
         print(f'Eatapa - 2.4 - Substituindo os valores em df com base no dicionário.')
         self.df_filtered['NOMENCLATURA'] = np.where(
@@ -81,6 +90,28 @@ class ProcedurePackageProcess:
         print(f'Quantidade de linhas e Colunas de self.df_filtered : {self.df_filtered.shape}')
         print(f'Colunas de self.df_filtered: {self.df_filtered.columns}')
         print(f'ETAPA - 2.4 - Concluída')
+
+        # chamando a função 3
+        self.create_colum_key()
+    
+    # 3. - Criando a coluna CHAVE_1
+    def create_colum_key(self):
+        print(f'ETAPA - 3 - Criando a coluna CHAVE_1')
+        print(f'ETAPA - 3.1 - Criando a coluna CHAVE_1')
+        # Criando a coluna CHAVE_1 concatenando as colunas especificadas
+        columns = 'URG_ELE_TAX_MAT_CH_ANE_AUX'
+        self.df_filtered['CHAVE_1'] = (
+            self.df_filtered['URGENCIA'].astype(str) + ' ' + 
+            self.df_filtered['ELETIVA'].astype(str) + ' ' + 
+            self.df_filtered['TAXAS'].astype(str) + ' ' + 
+            self.df_filtered['MATERIAL'].astype(str) + ' ' + 
+            self.df_filtered['CONSULTA_HONORARIO'].astype(str) + ' ' + 
+            self.df_filtered['ANESTESISTA'].astype(str) + ' ' + 
+            self.df_filtered['AUXILIAR'].astype(str)
+            )
+        self.df_filtered.rename(columns={'CHAVE_1': columns}, inplace=True)
+        print(self.df_filtered.head(2))
+        print(f'ETAPA - 3.1 - Concluída')
 
     def save_to_excel(self):
         # Salvando os dados processados em um arquivo Excel

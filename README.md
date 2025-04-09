@@ -18,4 +18,8 @@
     - 2.2 - Criamos um dicionário para mapear as chaves de busca e trazer os valores do item *`1.4`*.
     - 2.3 - Substituindo os valores em df com base no dicionário.
     - 2.4 - filtrar o que precisamos.
+
+- 3 - Criando a Coluna *__CHAVE__*.
+    - 3.1 União e combinações possíveis para as seguintes colunas:
+      - `URGENCIA`, `ELETIVA`, `TAXAS`, `MATERIAL`, `CONSULTA_HONORARIO`, `ANESTESISTA`, `AUXILIAR`.
 ---
