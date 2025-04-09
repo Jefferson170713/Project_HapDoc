@@ -29,7 +29,7 @@ class HapDoc(QMainWindow):
         space = 5 * ' '
         self.setCentralWidget(self.program_hapdoc)
         self.program_hapdoc.addTab(self.procedures_package, f'{space} Pacotes e Procedimentos {space}')
-        self.program_hapdoc.addTab(self.procedures_package_, f'{space} Centro Clínico {space}')
+        #self.program_hapdoc.addTab(self.procedures_package_, f'{space} Centro Clínico {space}')
         self.program_hapdoc.setDocumentMode(True)
         self.program_hapdoc.setMovable(True)
         # Criando a aba "Pacote Procedimento"
