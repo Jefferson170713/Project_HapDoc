@@ -17,9 +17,6 @@ class WindowProcedurePackage:
         self.sigo_path = None
         self.output_path = None
         self.df = pd.DataFrame()
-        self.df_model = pd.DataFrame()
-        self.df_sigo = pd.DataFrame()
-        self.df_final = pd.DataFrame()
     
     def create_procedures_and_package_tab(self, procedures_package):
         layout_procedures_package = QVBoxLayout()
@@ -92,7 +89,7 @@ class WindowProcedurePackage:
                 # Define o caminho do arquivo
                 procedure_processor.file_path = self.file_path 
                 # Carrega os dados e armazena os DataFrames
-                self.df, self.df_cod, self.df_sigo = procedure_processor.load_data()
+                self.df = procedure_processor.load_data()
 
             except Exception as erro:
                 QMessageBox.critical(self.parent, "Erro", f"Erro ao carregar o arquivo:\n{str(erro)} \n1 - Verifique o formato do arquivo. \n2 - O arquivo deve ser um CSV \n3 - Ou as Colunas desajustadas!!!")

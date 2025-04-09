@@ -51,7 +51,7 @@ class ProcedurePackageProcess:
         # executando a função 2
         self.process_data_one()
 
-        return self.df, self.df_cod, self.df_sigo
+        return self.df
 
     # 2. - Processando as colunas do arquivo principal
     def process_data_one(self):
@@ -196,6 +196,7 @@ class ProcedurePackageProcess:
         self.df_key_grouped['CD_SERVIÇO_HONORARIO'] = self.df_key_grouped['CD_SERVIÇO_HONORARIO'].astype(str)
 
         self.df_key_grouped['VALOR_PROPOSTO'] = 'R$ ' + self.df_key_grouped['VALOR_PROPOSTO'].astype(str)
+        print(f'Quantidade de linhas e colunas de self.df_key_grouped: {self.df_key_grouped.shape}')
         print(self.df_key_grouped.ANO_TABELA.value_counts())
         print(self.df_key_grouped.head(2))
         print(f'ETAPA - 4.9 Concluído')
