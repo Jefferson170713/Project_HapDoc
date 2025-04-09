@@ -22,4 +22,21 @@
 - 3 - Criando a Coluna *__CHAVE__*.
     - 3.1 União e combinações possíveis para as seguintes colunas:
       - `URGENCIA`, `ELETIVA`, `TAXAS`, `MATERIAL`, `CONSULTA_HONORARIO`, `ANESTESISTA`, `AUXILIAR`.
+
+- 4 - Processando as regras do jurídico para utilizar o arquivo.
+    - 4.1 - Selecionando as colunas que serão utilizadas.
+    - 4.2 - Concatenando as informações que precisamos em uma única coluna.
+    - 4.3 - Removendo inconsistências da coluna e transformando em tipo String.
+    - 4.4 - Ordenando `CD_TIPO_REDE`.
+    - 4.5 - Removendo as duplicadas e resetando o index da nova tabela.
+    - 4.6 - Agrupando por CD_SERVIÇO_HONORARIO e concatenando os valores de `CD_TIPO_REDE` por '#".
+        - Adicionando uma coluna com a quantidade de redes.
+    - 4.7 - Renomeando as colunas para manter o formato desejado.
+    - 4.8 - Quebrando a coluna CHAVE em 3 colunas separadas por '#'.
+        - Reordenando as colunas desejadas.
+    - 4.9 - Ordenando a o df por:
+        -   ´URG_ELE_TAX_MAT_CH_ANE_AUX´.
+        -   ´VALOR_PROPOSTO´.
+        -   ´QUANTIDADE_REDES´.
+
 ---
