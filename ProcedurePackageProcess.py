@@ -50,6 +50,7 @@ class ProcedurePackageProcess:
 
         # executando a função 2
         self.process_data_one()
+        self.df = self.df_key_grouped.copy()
 
         return self.df
 
@@ -60,7 +61,7 @@ class ProcedurePackageProcess:
         print(f'Etapa - 2.1 - Selecionando as (12) colunas que usaremos')
         columns_selects = [
             'ANO_TABELA', 'CD_SERVIÇO_HONORARIO', 'CD_PROCEDIMENTO_TUSS', 'NM_SERV_HONORARIO', 'NM_PROCEDIMENTO_TUSS',
-            'VALOR_PROPOSTO', 'CD_TIPO_ACOMODACAO', 'URGENCIA', 'ELETIVA', 'TAXAS', 'MATERIAL',
+            'VALOR_PROPOSTO', 'CD_TIPO_ACOMODACAO', 'URGENCIA', 'ELETIVA', 'TAXAS', 'MATERIAL', 'MEDICAMENTO',
             'CONSULTA_HONORARIO', 'ANESTESISTA', 'AUXILIAR', 'CD_TIPO_REDE'
         ]
         self.df_filtered = self.df[columns_selects].copy()
@@ -103,12 +104,13 @@ class ProcedurePackageProcess:
         print(f'ETAPA - 3 - Criando a coluna CHAVE_1')
         print(f'ETAPA - 3.1 - Criando a coluna CHAVE_1')
         # Criando a coluna CHAVE_1 concatenando as colunas especificadas
-        columns = 'URG_ELE_TAX_MAT_CH_ANE_AUX'
+        columns = 'URG_ELE_TAX_MAT_MED_CH_ANE_AUX'
         self.df_filtered['CHAVE_1'] = (
             self.df_filtered['URGENCIA'].astype(str) + ' ' + 
             self.df_filtered['ELETIVA'].astype(str) + ' ' + 
             self.df_filtered['TAXAS'].astype(str) + ' ' + 
             self.df_filtered['MATERIAL'].astype(str) + ' ' + 
+            self.df_filtered['MEDICAMENTO'].astype(str) + ' ' + 
             self.df_filtered['CONSULTA_HONORARIO'].astype(str) + ' ' + 
             self.df_filtered['ANESTESISTA'].astype(str) + ' ' + 
             self.df_filtered['AUXILIAR'].astype(str)
@@ -123,7 +125,7 @@ class ProcedurePackageProcess:
         print(f'ETAPA - 4.1 - Selecionando as colunas que serão utilizadas.')
         self.df_key = self.df_filtered[
             ['ANO_TABELA','CD_SERVIÇO_HONORARIO','VALOR_PROPOSTO',
-            'URG_ELE_TAX_MAT_CH_ANE_AUX','CD_TIPO_REDE', 'NOMENCLATURA', 
+            'URG_ELE_TAX_MAT_MED_CH_ANE_AUX','CD_TIPO_REDE', 'NOMENCLATURA', 
             'CD_TIPO_ACOMODACAO', 'CD_PROCEDIMENTO_TUSS']
         ].copy()
         print(f'ETAPA - 4.1 Concluído')
@@ -132,7 +134,7 @@ class ProcedurePackageProcess:
         self.df_key['CHAVE_3_AUX'] = (
             self.df_key['CD_SERVIÇO_HONORARIO'].astype(str) + '#' +
             self.df_key['VALOR_PROPOSTO'].astype(str) + '#' +
-            self.df_key['URG_ELE_TAX_MAT_CH_ANE_AUX'].astype(str) + '#' +
+            self.df_key['URG_ELE_TAX_MAT_MED_CH_ANE_AUX'].astype(str) + '#' +
             self.df_key['NOMENCLATURA'].astype(str) + '#' +
             self.df_key['CD_TIPO_ACOMODACAO'].astype(str) + '#' +
             self.df_key['CD_PROCEDIMENTO_TUSS'].astype(str) + '#' +
@@ -173,7 +175,7 @@ class ProcedurePackageProcess:
         print(f'ETAPA - 4.8 Quebrando a coluna CHAVE em 3 colunas separadas por "#".')
         self.df_key_grouped[
             ['CD_SERVIÇO_HONORARIO', 'VALOR_PROPOSTO', 
-             'URG_ELE_TAX_MAT_CH_ANE_AUX', 'NOMENCLATURA', 
+             'URG_ELE_TAX_MAT_MED_CH_ANE_AUX', 'NOMENCLATURA', 
              'CD_TIPO_ACOMODACAO', 'CD_PROCEDIMENTO_TUSS',
                'ANO_TABELA']
             ] = self.df_key_grouped['CD_SERVIÇO_HONORARIO'].str.split('#', expand=True)
@@ -182,14 +184,14 @@ class ProcedurePackageProcess:
             ['ANO_TABELA','CD_SERVIÇO_HONORARIO',
              'CD_PROCEDIMENTO_TUSS' ,'NOMENCLATURA',
              'VALOR_PROPOSTO', 'CD_TIPO_ACOMODACAO', 
-             'URG_ELE_TAX_MAT_CH_ANE_AUX', 'QUANTIDADE_REDES', 
+             'URG_ELE_TAX_MAT_MED_CH_ANE_AUX', 'QUANTIDADE_REDES', 
              'CD_TIPO_REDE']
         ].copy()
         print(f'ETAPA - 4.8 Concluído')
 
-        print(f'ETAPA - 4.9 Ordenando a o df: "URG_ELE_TAX_MAT_CH_ANE_AUX", "VALOR_PROPOSTO" e "QUANTIDADE_REDES".')
+        print(f'ETAPA - 4.9 Ordenando a o df: "URG_ELE_TAX_MAT_MED_CH_ANE_AUX", "VALOR_PROPOSTO" e "QUANTIDADE_REDES".')
         self.df_key_grouped.sort_values(
-            by=['URG_ELE_TAX_MAT_CH_ANE_AUX', 'VALOR_PROPOSTO', 'QUANTIDADE_REDES'],
+            by=['URG_ELE_TAX_MAT_MED_CH_ANE_AUX', 'VALOR_PROPOSTO', 'QUANTIDADE_REDES'],
             inplace=True
         )
         self.df_key_grouped.reset_index(drop=True, inplace=True)

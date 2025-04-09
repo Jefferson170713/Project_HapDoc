@@ -7,6 +7,9 @@ from PyQt5.QtWidgets import QFrame
 from PyQt5.QtWidgets import QFileDialog
 from PyQt5.QtWidgets import QMessageBox
 from PyQt5.QtWidgets import QHBoxLayout
+from datetime import datetime
+import os
+from pandas import ExcelWriter
 from ProcedurePackageProcess import ProcedurePackageProcess
 
 class WindowProcedurePackage:
@@ -104,6 +107,7 @@ class WindowProcedurePackage:
     
     # Função para processar e salvar o arquivo
     def process_and_save(self):
+        print(self.df.head(2))
         if not self.file_path:
             QMessageBox.warning(self.parent, "Aviso", "Nenhum arquivo foi carregado!")
             return
@@ -113,15 +117,52 @@ class WindowProcedurePackage:
         if not save_path:
             return
 
-        # Processar o arquivo
         try:
+            # Adiciona a extensão .xlsx se não estiver presente
+            if not save_path.endswith(".xlsx"):
+                save_path += ".xlsx"
+
+            # Adiciona a data e hora ao nome do arquivo
+            date = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")  # Formato: AAAA-MM-DD_HH-MM-SS
+            base_name, ext = os.path.splitext(save_path)  # Divide o caminho em nome base e extensão
+            save_path = f"{base_name}_{date}{ext}"  # Adiciona a data ao nome do arquivo
+
+            # Processar o arquivo
             self.output_path = save_path
-            self.load_data()
-            self.process_data()
-            self.save_to_excel()
+
+            # Verifica se o DataFrame self.df está carregado
+            if self.df.empty:
+                QMessageBox.warning(self.parent, "Aviso", "Os dados não foram carregados corretamente!")
+                return
+
+            # Renomeia as colunas antes de salvar
+            self.df.rename(
+                columns={
+                    'CD_SERVIÇO_HONORARIO': 'CÓDIGO AUTORIZAÇÃO',
+                    'VALOR_PROPOSTO': 'VALOR',
+                    'CD_PROCEDIMENTO_TUSS': 'CÓDIGO TUSS',
+                },
+                inplace=True
+            )
+
+            # Criando o arquivo Excel com a aba principal
+            with ExcelWriter(save_path, engine='openpyxl') as writer:
+                # Salvando a aba principal
+                self.df.to_excel(writer, index=False, sheet_name='GERAL')
+
+                # Salvando as abas adicionais
+                for num, save in enumerate(self.df['URG_ELE_TAX_MAT_MED_CH_ANE_AUX'].unique()):
+                    # Filtrando os dados
+                    filtered_df = self.df[self.df['URG_ELE_TAX_MAT_MED_CH_ANE_AUX'] == save].copy()
+                    sheet_name = f'NEG. {num + 1}'
+
+                    # Salvando no mesmo arquivo Excel com o nome da aba correspondente
+                    filtered_df.to_excel(writer, index=False, sheet_name=sheet_name)
 
             QMessageBox.information(self.parent, "Sucesso", f"Arquivo processado e salvo em:\n{save_path}")
+
         except Exception as e:
+            # Mensagem de erro detalhada
             QMessageBox.critical(self.parent, "Erro", f"Ocorreu um erro ao processar o arquivo:\n{str(e)}")
     
     # Função para limpar o status
