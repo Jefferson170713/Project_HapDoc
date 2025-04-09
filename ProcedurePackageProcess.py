@@ -64,6 +64,7 @@ class ProcedurePackageProcess:
             'CONSULTA_HONORARIO', 'ANESTESISTA', 'AUXILIAR', 'CD_TIPO_REDE'
         ]
         self.df_filtered = self.df[columns_selects].copy()
+        self.df_filtered['ANO_TABELA'] = self.df_filtered['ANO_TABELA'].astype(str).str.replace('.0', '').str.zfill(8)
         print(f'ETAPA - 2.1 - Concluida')
 
         # 2.2 - Criamos um dicionário para mapear as chaves de busca e trazer os valores do item *`1.4`*.
@@ -95,6 +96,7 @@ class ProcedurePackageProcess:
 
         # chamando a função 3
         self.create_colum_key()
+        self.process_data_juridic()
     
     # 3. - Criando a coluna CHAVE_1
     def create_colum_key(self):
@@ -194,6 +196,8 @@ class ProcedurePackageProcess:
         self.df_key_grouped['CD_SERVIÇO_HONORARIO'] = self.df_key_grouped['CD_SERVIÇO_HONORARIO'].astype(str)
 
         self.df_key_grouped['VALOR_PROPOSTO'] = 'R$ ' + self.df_key_grouped['VALOR_PROPOSTO'].astype(str)
+        print(self.df_key_grouped.ANO_TABELA.value_counts())
+        print(self.df_key_grouped.head(2))
         print(f'ETAPA - 4.9 Concluído')
 
     def save_to_excel(self):
