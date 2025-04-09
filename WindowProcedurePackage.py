@@ -24,9 +24,24 @@ class WindowProcedurePackage:
     def create_procedures_and_package_tab(self, procedures_package):
         layout_procedures_package = QVBoxLayout()
 
+        # Layout horizontal para o QLabel e o botão "Limpar Status"
+        status_layout = QHBoxLayout()
+
         # QLabel para exibir o status do arquivo
         self.label_status = QLabel("Nenhum arquivo carregado.")
-        layout_procedures_package.addWidget(self.label_status)
+        status_layout.addWidget(self.label_status)
+
+        # Adiciona um espaço expansível para empurrar o botão para a direita
+        status_layout.addStretch()
+
+        # Botão para limpar o status
+        btn_clear_status = QPushButton("Limpar Status")
+        btn_clear_status.setFixedSize(150, 35)
+        btn_clear_status.clicked.connect(self.clear_status)  # Conecta à função clear_status
+        status_layout.addWidget(btn_clear_status)
+
+        # Adiciona o layout horizontal ao layout vertical principal
+        layout_procedures_package.addLayout(status_layout)
 
         # QTextEdit para exibir informações do arquivo carregado
         self.text_edit_info = QTextEdit()
@@ -44,7 +59,7 @@ class WindowProcedurePackage:
 
         # Botão para selecionar o arquivo principal
         btn_select_file = QPushButton("Selecionar Arquivo")
-        btn_select_file.setFixedSize(150, 35) 
+        btn_select_file.setFixedSize(150, 35)
         btn_select_file.clicked.connect(self.select_file)
         button_layout.addWidget(btn_select_file)
 
@@ -78,12 +93,12 @@ class WindowProcedurePackage:
                 procedure_processor.file_path = self.file_path 
                 # Carrega os dados e armazena os DataFrames
                 self.df, self.df_cod, self.df_sigo = procedure_processor.load_data()
-                #procedure_processor.load_data()  # Chama a função para carregar os dados
-                #self.label_status.setText(f"Arquivo carregado e processado: {split_file}")
+
             except Exception as erro:
                 QMessageBox.critical(self.parent, "Erro", f"Erro ao carregar o arquivo:\n{str(erro)} \n1 - Verifique o formato do arquivo. \n2 - O arquivo deve ser um CSV \n3 - Ou as Colunas desajustadas!!!")
 
-            self.label_status.setText(f"Arquivo carregado: {split_file}")
+            #self.label_status.setText(f"Arquivo carregado: {split_file}")
+            self.label_status.setText(f"Arquivo carregado com sucesso!")
             self.text_edit_info.setText(f"Arquivo selecionado:\n{split_file}")
 
         else:
@@ -111,3 +126,8 @@ class WindowProcedurePackage:
             QMessageBox.information(self.parent, "Sucesso", f"Arquivo processado e salvo em:\n{save_path}")
         except Exception as e:
             QMessageBox.critical(self.parent, "Erro", f"Ocorreu um erro ao processar o arquivo:\n{str(e)}")
+    
+    # Função para limpar o status
+    def clear_status(self):
+        self.label_status.setText("Nenhum arquivo carregado.")
+        self.text_edit_info.clear()
