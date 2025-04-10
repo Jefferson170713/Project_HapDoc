@@ -132,12 +132,12 @@ class ProcedurePackageProcess:
 
         print(f'ETAPA - 4.2 Concatenando as informações que precisamos em uma única coluna.')
         self.df_key['CHAVE_3_AUX'] = (
-            self.df_key['CD_SERVIÇO_HONORARIO'].astype(str) + '#' +
-            self.df_key['VALOR_PROPOSTO'].astype(str) + '#' +
-            self.df_key['URG_ELE_TAX_MAT_MED_CH_ANE_AUX'].astype(str) + '#' +
-            self.df_key['NOMENCLATURA'].astype(str) + '#' +
-            self.df_key['CD_TIPO_ACOMODACAO'].astype(str) + '#' +
-            self.df_key['CD_PROCEDIMENTO_TUSS'].astype(str) + '#' +
+            self.df_key['CD_SERVIÇO_HONORARIO'].astype(str) + '@' +
+            self.df_key['VALOR_PROPOSTO'].astype(str) + '@' +
+            self.df_key['URG_ELE_TAX_MAT_MED_CH_ANE_AUX'].astype(str) + '@' +
+            self.df_key['NOMENCLATURA'].astype(str) + '@' +
+            self.df_key['CD_TIPO_ACOMODACAO'].astype(str) + '@' +
+            self.df_key['CD_PROCEDIMENTO_TUSS'].astype(str) + '@' +
             self.df_key['ANO_TABELA'].astype(str)
         )
         print(f'ETAPA - 4.2 Concluído')
@@ -155,7 +155,7 @@ class ProcedurePackageProcess:
         self.df_key.reset_index(drop=True, inplace=True)
         print(f'ETAPA - 4.5 Concluído')
 
-        print(f'ETAPA - 4.6 Agrupando por CD_SERVIÇO_HONORARIO e concatenando os valores de `CD_TIPO_REDE` por "#".')
+        print(f'ETAPA - 4.6 Agrupando por CD_SERVIÇO_HONORARIO e concatenando os valores de `CD_TIPO_REDE` por "@".')
         self.df_key_grouped = (
             self.df_key.groupby('CHAVE_3_AUX')['CD_TIPO_REDE']
             .apply(', '.join)
@@ -172,13 +172,13 @@ class ProcedurePackageProcess:
         self.df_key_grouped.columns = ['CD_SERVIÇO_HONORARIO', 'CD_TIPO_REDE', 'QUANTIDADE_REDES']
         print(f'ETAPA - 4.7 Concluído')
 
-        print(f'ETAPA - 4.8 Quebrando a coluna CHAVE em 3 colunas separadas por "#".')
+        print(f'ETAPA - 4.8 Quebrando a coluna CHAVE em 3 colunas separadas por "@".')
         self.df_key_grouped[
             ['CD_SERVIÇO_HONORARIO', 'VALOR_PROPOSTO', 
              'URG_ELE_TAX_MAT_MED_CH_ANE_AUX', 'NOMENCLATURA', 
              'CD_TIPO_ACOMODACAO', 'CD_PROCEDIMENTO_TUSS',
                'ANO_TABELA']
-            ] = self.df_key_grouped['CD_SERVIÇO_HONORARIO'].str.split('#', expand=True)
+            ] = self.df_key_grouped['CD_SERVIÇO_HONORARIO'].str.split('@', expand=True)
         
         self.df_key_grouped = self.df_key_grouped[
             ['ANO_TABELA','CD_SERVIÇO_HONORARIO',
