@@ -7,6 +7,7 @@ from PyQt5.QtGui import QIcon
 
 from PyQt5.QtWidgets import QWidget
 from WindowProcedurePackage import WindowProcedurePackage
+from WindowCenterClinic import WindowCenterClinic
 
 
 # Classe principal da aplicação
@@ -18,9 +19,10 @@ class HapDoc(QMainWindow):
         self.setWindowIcon(QIcon("./ARQUIVOS/logo/logo.ico"))
         self.program_hapdoc = QTabWidget()
         self.procedures_package = QWidget()
-        self.procedures_package_ = QWidget()
+        self.center_clinic = QWidget()
         # Instanciando a classe ProcedurePackageProcess
         self.procedure_package_process = WindowProcedurePackage(parent=self)
+        self.center_clinic_process = WindowCenterClinic(parent=self)
 
         self.createview()
 
@@ -29,11 +31,12 @@ class HapDoc(QMainWindow):
         space = 5 * ' '
         self.setCentralWidget(self.program_hapdoc)
         self.program_hapdoc.addTab(self.procedures_package, f'{space} Pacotes e Procedimentos {space}')
-        #self.program_hapdoc.addTab(self.procedures_package_, f'{space} Centro Clínico {space}')
+        self.program_hapdoc.addTab(self.center_clinic, f'{space} Centro Clínico {space}')
         self.program_hapdoc.setDocumentMode(True)
         self.program_hapdoc.setMovable(True)
         # Criando a aba "Pacote Procedimento"
         self.procedure_package_process.create_procedures_and_package_tab(self.procedures_package)
+        self.center_clinic_process.create_center_clinic_tab(self.center_clinic)
 
 
 # Loop do programa em funcionamento
