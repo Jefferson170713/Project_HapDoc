@@ -12,6 +12,8 @@ from PyQt5.QtWidgets import QLineEdit
 from PyQt5.QtWidgets import QDialog
 from PyQt5.QtWidgets import QTableWidget
 from PyQt5.QtWidgets import QTableWidgetItem
+from PyQt5.QtWidgets import QScrollArea
+from PyQt5.QtWidgets import QWidget
 from datetime import datetime
 import os
 from ProcedurePackageProcess import ProcedurePackageProcess
@@ -143,8 +145,6 @@ class WindowCenterClinic:
     def clear_status(self):
         self.label_status.setText("Nenhum arquivo carregado.")
 
-from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QPushButton, QTableWidget, QTableWidgetItem, QFrame, QDialog, QScrollArea, QWidget
-
 class SearchWindow(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -220,6 +220,7 @@ class SearchWindow(QDialog):
     def perform_search(self):
         # Função para realizar a pesquisa (a ser implementada)
         # Aqui você pode carregar os dados na tabela com base no termo pesquisado
+        print(f'{self.search_input.text()}')
         search_term = self.search_input.text()
         if search_term:
             # Exemplo de dados fictícios para simular a pesquisa
