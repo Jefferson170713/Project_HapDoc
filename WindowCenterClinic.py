@@ -8,6 +8,10 @@ from PyQt5.QtWidgets import QMessageBox
 from PyQt5.QtWidgets import QHBoxLayout
 from PyQt5.QtWidgets import QCheckBox
 from PyQt5.QtWidgets import QButtonGroup
+from PyQt5.QtWidgets import QLineEdit
+from PyQt5.QtWidgets import QDialog
+from PyQt5.QtWidgets import QTableWidget
+from PyQt5.QtWidgets import QTableWidgetItem
 from datetime import datetime
 import os
 from ProcedurePackageProcess import ProcedurePackageProcess
@@ -55,7 +59,7 @@ class WindowCenterClinic:
         self.checkbox_group.addButton(self.checkbox_contrato_medico)
         checkbox_layout.addWidget(self.checkbox_contrato_medico)
 
-        self.checkbox_contratoterapia = QCheckBox("Contratoterapia")
+        self.checkbox_contratoterapia = QCheckBox("Contrato Terapia")
         self.checkbox_group.addButton(self.checkbox_contratoterapia)
         checkbox_layout.addWidget(self.checkbox_contratoterapia)
 
@@ -93,9 +97,8 @@ class WindowCenterClinic:
     
     # Função para pesquisar o arquivo principal
     def search_file(self):
-        # Implementação futura
-        pass
-
+        search_window = SearchWindow(self.parent)
+        search_window.exec_()  # Abre a janela de pesquisa como modal
     # Função para processar e salvar o arquivo
     def process_and_save(self):
         if not self.file_path:
@@ -132,10 +135,109 @@ class WindowCenterClinic:
 
             QMessageBox.information(self.parent, "Sucesso", f"Arquivo processado e salvo em:\n{save_path}")
 
-        except Exception as e:
+        except Exception as erro:
             # Mensagem de erro detalhada
-            QMessageBox.critical(self.parent, "Erro", f"Ocorreu um erro ao processar o arquivo:\n{str(e)}")
+            QMessageBox.critical(self.parent, "Erro", f"Ocorreu um erro ao processar o arquivo:\n{str(erro)}")
     
     # Função para limpar o status
     def clear_status(self):
         self.label_status.setText("Nenhum arquivo carregado.")
+
+from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QPushButton, QTableWidget, QTableWidgetItem, QFrame, QDialog, QScrollArea, QWidget
+
+class SearchWindow(QDialog):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle("Pesquisar Dados")
+        self.setFixedSize(600, 400)  # Tamanho fixo da janela
+        self.init_ui()
+
+    def init_ui(self):
+        # Cria o layout principal
+        main_layout = QVBoxLayout()
+
+        # Linha para entrada de texto e botão de pesquisa
+        search_layout = QHBoxLayout()
+        self.search_input = QLineEdit()
+        self.search_input.setPlaceholderText("Digite o termo para pesquisar...")
+        search_layout.addWidget(self.search_input)
+
+        btn_search = QPushButton("Pesquisar")
+        btn_search.setFixedSize(100, 30)
+        btn_search.clicked.connect(self.perform_search)  # Conecta à função de pesquisa
+        search_layout.addWidget(btn_search)
+
+        main_layout.addLayout(search_layout)
+
+        # Separador
+        separator1 = QFrame()
+        separator1.setFrameShape(QFrame.HLine)
+        separator1.setFrameShadow(QFrame.Sunken)
+        main_layout.addWidget(separator1)
+
+        # Tabela para exibir os resultados
+        self.table = QTableWidget()
+        self.table.setColumnCount(14)  # Define 14 colunas
+        self.table.setHorizontalHeaderLabels([
+            "CD_PROTOCOLO", "NM_RAZAO_NOME", "DT_INI_VIGENCIA",
+            "CD_ESPECIALIDADE", "DS_ESPECIALIDADE","VL_HORA_PROPOSTO", "CD_LOCAL",
+            "CD_ORDEM_LOCAL", "NU_ORDEM_LOCA", "FL_URGENCIA",
+            "FL_ELETIVA", "CD_LOCAL_ATENDIMENTO", "NM_FANTASIA", "CD_UF"
+        ])
+        #self.table.setRowCount()  # Exibe inicialmente 5 linhas
+        main_layout.addWidget(self.table)
+
+        # Separador
+        separator2 = QFrame()
+        separator2.setFrameShape(QFrame.HLine)
+        separator2.setFrameShadow(QFrame.Sunken)
+        main_layout.addWidget(separator2)
+
+        # Botão para armazenar a informação (centralizado)
+        btn_store_layout = QHBoxLayout()
+        btn_store = QPushButton("Armazenar Informação")
+        btn_store.setFixedSize(200, 40)
+        btn_store.clicked.connect(self.store_information)  # Conecta à função de armazenamento
+        btn_store_layout.addStretch()  # Adiciona espaço antes do botão
+        btn_store_layout.addWidget(btn_store)
+        btn_store_layout.addStretch()  # Adiciona espaço depois do botão
+        main_layout.addLayout(btn_store_layout)
+
+        # Adiciona o layout principal a um widget para o QScrollArea
+        container_widget = QWidget()
+        container_widget.setLayout(main_layout)
+
+        # Cria uma área de rolagem
+        scroll_area = QScrollArea()
+        scroll_area.setWidgetResizable(True)
+        scroll_area.setWidget(container_widget)
+
+        # Define o layout da janela
+        window_layout = QVBoxLayout()
+        window_layout.addWidget(scroll_area)
+        self.setLayout(window_layout)
+
+    def perform_search(self):
+        # Função para realizar a pesquisa (a ser implementada)
+        # Aqui você pode carregar os dados na tabela com base no termo pesquisado
+        search_term = self.search_input.text()
+        if search_term:
+            # Exemplo de dados fictícios para simular a pesquisa
+            data = [
+                [f"Dado {row + 1}-{col + 1}" for col in range(14)]
+                for row in range(20)  # Simulando 20 linhas de dados
+            ]
+
+            # Define o número de linhas da tabela com base nos dados
+            self.table.setRowCount(len(data))
+
+            # Preenche a tabela com os dados
+            for row_idx, row_data in enumerate(data):
+                for col_idx, cell_data in enumerate(row_data):
+                    self.table.setItem(row_idx, col_idx, QTableWidgetItem(cell_data))
+        else:
+            QMessageBox.warning(self, "Aviso", "Digite um termo para pesquisar!")
+
+    def store_information(self):
+        # Função para armazenar a informação selecionada (a ser implementada)
+        QMessageBox.information(self, "Informação", "Informação armazenada com sucesso!")
