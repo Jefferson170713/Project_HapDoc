@@ -1,5 +1,13 @@
 import pandas as pd
-from PyQt5.QtWidgets import QVBoxLayout, QLabel, QPushButton, QFrame, QFileDialog, QMessageBox, QHBoxLayout, QCheckBox, QButtonGroup
+from PyQt5.QtWidgets import QVBoxLayout
+from PyQt5.QtWidgets import QLabel
+from PyQt5.QtWidgets import QPushButton
+from PyQt5.QtWidgets import QFrame
+from PyQt5.QtWidgets import QFileDialog
+from PyQt5.QtWidgets import QMessageBox
+from PyQt5.QtWidgets import QHBoxLayout
+from PyQt5.QtWidgets import QCheckBox
+from PyQt5.QtWidgets import QButtonGroup
 from datetime import datetime
 import os
 from ProcedurePackageProcess import ProcedurePackageProcess

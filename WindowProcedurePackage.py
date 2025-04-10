@@ -67,7 +67,7 @@ class WindowProcedurePackage:
         button_layout.addStretch()
 
         # Botão para processar e salvar o arquivo
-        btn_process_save = QPushButton("Processar e Salvar")
+        btn_process_save = QPushButton("Salvar")
         btn_process_save.setFixedSize(150, 35)
         btn_process_save.clicked.connect(self.process_and_save)
         button_layout.addWidget(btn_process_save)
