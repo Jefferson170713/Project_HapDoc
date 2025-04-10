@@ -16,7 +16,7 @@ from PyQt5.QtWidgets import QScrollArea
 from PyQt5.QtWidgets import QWidget
 from datetime import datetime
 import os
-from ProcedurePackageProcess import ProcedurePackageProcess
+from ARQUIVOS.Oracle_Jdbc.jdbc_permission import JdbcPermission 
 
 class WindowCenterClinic:
     def __init__(self, parent=None):
@@ -151,6 +151,8 @@ class SearchWindow(QDialog):
         self.setWindowTitle("Pesquisar Dados")
         self.setFixedSize(600, 400)  # Tamanho fixo da janela
         self.init_ui()
+        self.df_search = pd.DataFrame()  # DataFrame para armazenar os dados pesquisados
+        self.parent = parent  # Armazena a referência ao widget pai
 
     def init_ui(self):
         # Cria o layout principal
@@ -218,24 +220,35 @@ class SearchWindow(QDialog):
         self.setLayout(window_layout)
 
     def perform_search(self):
-        # Função para realizar a pesquisa (a ser implementada)
-        # Aqui você pode carregar os dados na tabela com base no termo pesquisado
-        print(f'{self.search_input.text()}')
+        # Obtém o termo de pesquisa e o caminho do driver JDBC
         search_term = self.search_input.text()
+        path_drive = r'./ARQUIVOS/Oracle_Jdbc/ojdbc8.jar'
+
         if search_term:
-            # Exemplo de dados fictícios para simular a pesquisa
-            data = [
-                [f"Dado {row + 1}-{col + 1}" for col in range(14)]
-                for row in range(20)  # Simulando 20 linhas de dados
-            ]
+            try:
+                # Instancia a classe JdbcPermission
+                jdbc_permission = JdbcPermission(path_drive)
 
-            # Define o número de linhas da tabela com base nos dados
-            self.table.setRowCount(len(data))
+                # Usa o método fetch_data para buscar os dados
+                df = jdbc_permission.fetch_data(search_term)
 
-            # Preenche a tabela com os dados
-            for row_idx, row_data in enumerate(data):
-                for col_idx, cell_data in enumerate(row_data):
-                    self.table.setItem(row_idx, col_idx, QTableWidgetItem(cell_data))
+                # Verifica se o DataFrame retornado está vazio
+                if df.empty:
+                    QMessageBox.warning(self, "Aviso", "Nenhum dado encontrado para o termo pesquisado!")
+                    return
+
+                # Define o número de linhas e colunas da tabela com base no DataFrame
+                self.table.setRowCount(len(df))
+                self.table.setColumnCount(len(df.columns))
+                self.table.setHorizontalHeaderLabels(df.columns)
+
+                # Preenche a tabela com os dados do DataFrame
+                for row_idx, row_data in df.iterrows():
+                    for col_idx, cell_data in enumerate(row_data):
+                        self.table.setItem(row_idx, col_idx, QTableWidgetItem(str(cell_data)))
+
+            except Exception as erro:
+                QMessageBox.critical(self, "Erro", f"Erro ao buscar dados:\n{str(erro)}")
         else:
             QMessageBox.warning(self, "Aviso", "Digite um termo para pesquisar!")
 
