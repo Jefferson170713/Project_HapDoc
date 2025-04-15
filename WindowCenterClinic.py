@@ -161,7 +161,7 @@ class SearchWindow(QDialog):
         # Linha para entrada de texto e botão de pesquisa
         search_layout = QHBoxLayout()
         self.search_input = QLineEdit()
-        self.search_input.setPlaceholderText("Digite o termo para pesquisar...")
+        self.search_input.setPlaceholderText("Digite os Protocolos...")
         search_layout.addWidget(self.search_input)
 
         btn_search = QPushButton("Pesquisar")
