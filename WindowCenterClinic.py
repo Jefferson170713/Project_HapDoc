@@ -99,10 +99,19 @@ class WindowCenterClinic:
     
     # Função para pesquisar o arquivo principal
     def search_file(self):
+        # Cria uma instância da janela de pesquisa
         search_window = SearchWindow(self.parent)
         search_window.exec_()  # Abre a janela de pesquisa como modal
-    # Função para processar e salvar o arquivo
+
+        # Após fechar a janela de pesquisa, verifica se há dados no DataFrame
+        if search_window.df_search.empty:
+            #QMessageBox.information(self.parent, "Informação", "Dados carregados com sucesso!")
+            QMessageBox.warning(self.parent, "Aviso", "Nenhum dado foi carregado!")
+        else:
+            self.df = search_window.df_search  # Atribui o DataFrame ao self.df
+        # Função para processar e salvar o arquivo
     def process_and_save(self):
+        print(self.df.head())
         if not self.file_path:
             QMessageBox.warning(self.parent, "Aviso", "Nenhum arquivo foi carregado!")
             return
@@ -237,6 +246,9 @@ class SearchWindow(QDialog):
                     QMessageBox.warning(self, "Aviso", "Nenhum dado encontrado para o termo pesquisado!")
                     return
 
+                # Atualiza o self.df_search com os dados encontrados
+                self.df_search = df
+
                 # Define o número de linhas e colunas da tabela com base no DataFrame
                 self.table.setRowCount(len(df))
                 self.table.setColumnCount(len(df.columns))
@@ -253,5 +265,11 @@ class SearchWindow(QDialog):
             QMessageBox.warning(self, "Aviso", "Digite um termo para pesquisar!")
 
     def store_information(self):
-        # Função para armazenar a informação selecionada (a ser implementada)
+        # Verifica se há dados no DataFrame
+        if self.df_search.empty:
+            QMessageBox.warning(self, "Aviso", "Nenhuma informação foi encontrada para armazenar!")
+            return None
+
+        # Exibe uma mensagem de sucesso e retorna o DataFrame
         QMessageBox.information(self, "Informação", "Informação armazenada com sucesso!")
+        return self.df_search
