@@ -103,52 +103,23 @@ class WindowCenterClinic:
         search_window = SearchWindow(self.parent)
         search_window.exec_()  # Abre a janela de pesquisa como modal
 
-        # Após fechar a janela de pesquisa, verifica se há dados no DataFrame
-        if search_window.df_search.empty:
-            #QMessageBox.information(self.parent, "Informação", "Dados carregados com sucesso!")
-            QMessageBox.warning(self.parent, "Aviso", "Nenhum dado foi carregado!")
-        else:
-            self.df = search_window.df_search  # Atribui o DataFrame ao self.df
-        # Função para processar e salvar o arquivo
+        self.df = search_window.df_search  # Atribui o DataFrame ao self.df
+
     def process_and_save(self):
         print(self.df.head())
-        if not self.file_path:
-            QMessageBox.warning(self.parent, "Aviso", "Nenhum arquivo foi carregado!")
-            return
+        if self.df.empty:
+            QMessageBox.warning(self.parent, "Aviso", "Nenhum arquivo carregado!")
+            return None
+        # mostrar qual checkbox está selecionado
+        if self.checkbox_contrato_medico.isChecked():
+            print(f'Selecionar a função de contrato médico')
 
-        # Selecionar o local para salvar o arquivo processado
-        save_path, _ = QFileDialog.getSaveFileName(self.parent, "Salvar Arquivo", "", "Arquivos Excel (*.xlsx)")
-        if not save_path:
-            return
+        if self.checkbox_aditivo.isChecked():
+            print(f'Selecionar a função de aditivo')
 
-        try:
-            # Adiciona a extensão .xlsx se não estiver presente
-            if not save_path.endswith(".xlsx"):
-                save_path += ".xlsx"
-
-            # Adiciona a data e hora ao nome do arquivo
-            date = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")  # Formato: AAAA-MM-DD_HH-MM-SS
-            base_name, ext = os.path.splitext(save_path)  # Divide o caminho em nome base e extensão
-            save_path = f"{base_name}_{date}{ext}"  # Adiciona a data ao nome do arquivo
-
-            # Processar o arquivo
-            self.output_path = save_path
-
-            # Verifica se o DataFrame self.df está carregado
-            if self.df.empty:
-                QMessageBox.warning(self.parent, "Aviso", "Os dados não foram carregados corretamente!")
-                return
-
-            # Criando o arquivo Excel com a aba principal
-            with pd.ExcelWriter(save_path, engine='openpyxl') as writer:
-                # Salvando a aba principal
-                self.df.to_excel(writer, index=False, sheet_name='GERAL')
-
-            QMessageBox.information(self.parent, "Sucesso", f"Arquivo processado e salvo em:\n{save_path}")
-
-        except Exception as erro:
-            # Mensagem de erro detalhada
-            QMessageBox.critical(self.parent, "Erro", f"Ocorreu um erro ao processar o arquivo:\n{str(erro)}")
+        if self.checkbox_contratoterapia.isChecked():
+            print(f'Selecionar a função de contrato terapia')
+    
     
     # Função para limpar o status
     def clear_status(self):
@@ -241,10 +212,6 @@ class SearchWindow(QDialog):
                 # Usa o método fetch_data para buscar os dados
                 df = jdbc_permission.fetch_data(search_term)
 
-                # Verifica se o DataFrame retornado está vazio
-                if df.empty:
-                    QMessageBox.warning(self, "Aviso", "Nenhum dado encontrado para o termo pesquisado!")
-                    return
 
                 # Atualiza o self.df_search com os dados encontrados
                 self.df_search = df
