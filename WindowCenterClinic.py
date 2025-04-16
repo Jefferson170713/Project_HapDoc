@@ -17,7 +17,7 @@ from PyQt5.QtWidgets import QWidget
 from datetime import datetime
 import os
 from ARQUIVOS.Oracle_Jdbc.jdbc_permission import JdbcPermission 
-from docx import Document
+from docx import Document # type: ignore
 
 class WindowCenterClinic:
     def __init__(self, parent=None):
@@ -141,18 +141,20 @@ class WindowCenterClinic:
         # Implementar a função de contrato médico
         protocol = self.df['CD_PROTOCOLO'].unique()
         path_document = r'./ARQUIVOS/CONTRATO AMBULATORIAL NDI RP.docx'
-        doc = Document(path_document)
-
+        #doc = Document(path_document)
+        df_temp = self.df.copy()
         # Salvando o arquivo
         for protocolo in protocol:
             # Criar o nome do arquivo baseado no protocolo
+            doc = Document(path_document)
             self.count_contrat_meditate += 1
-            df_protocol = self.df[self.df['CD_PROTOCOLO'] == protocolo]
-            name_file = f'{self.count_contrat_meditate} - CONTRATO MÉDICO_{protocolo}.docx'
+            df_protocol = self.df[df_temp['CD_PROTOCOLO'] == protocolo].copy()  # Filtra o DataFrame para o protocolo atual
             name_string = df_protocol['NM_RAZAO_NOME'].iloc[0]  # Obtém o nome do DataFrame
+            name_file = f'{self.count_contrat_meditate} - CONTRATO MÉDICO_{protocolo}.docx'
 
             # Atualiza o texto no documento
-            self.replace_text(doc, name_string=name_string)  # Substitui o texto no documento
+            self.replace_text(doc, name_string)  # Substitui o texto no documento
+            print(name_string, protocolo)
 
             # Definindo o caminho completo para salvar o arquivo
             path_save = os.path.join(self.output_path, name_file)
