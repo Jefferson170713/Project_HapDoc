@@ -18,6 +18,10 @@ from datetime import datetime
 import os
 from ARQUIVOS.Oracle_Jdbc.jdbc_permission import JdbcPermission 
 from docx import Document # type: ignore
+from docx.shared import Pt # type: ignore
+from docx.enum.text import WD_PARAGRAPH_ALIGNMENT  # Para centralizar o texto # type: ignore
+from docx.oxml import OxmlElement # type: ignore
+from docx.oxml.ns import qn  # Para manipular bordas # type: ignore
 
 class WindowCenterClinic:
     def __init__(self, parent=None):
@@ -203,6 +207,59 @@ class WindowCenterClinic:
                     for run in par.runs:
                         if key in run.text:
                             run.text = run.text.replace(key, value)
+
+    # Função para adicionar bordas à tabela
+    def add_table_borders(self, table):
+        tbl = table._element
+        tblPr = tbl.xpath("w:tblPr")[0]
+        tblBorders = OxmlElement("w:tblBorders")
+        for border_name in ["top", "left", "bottom", "right", "insideH", "insideV"]:
+            border = OxmlElement(f"w:{border_name}")
+            border.set(qn("w:val"), "single")  # Tipo de borda
+            border.set(qn("w:sz"), "4")       # Espessura da borda
+            border.set(qn("w:space"), "0")    # Espaçamento
+            border.set(qn("w:color"), "000000")  # Cor da borda (preto)
+            tblBorders.append(border)
+        tblPr.append(tblBorders)
+
+    # Função para substituir o conteúdo de uma tabela específica
+    def replace_table_content(self, doc, table_index, df):
+        # As tratativas do df, devem acontecer aqui.
+        # TRATATIVAS DO DATAFRAME
+        # Localiza a tabela pelo índice
+        table = doc.tables[table_index]
+
+        # Substitui o cabeçalho da tabela
+        header_cells = table.rows[0].cells
+        for col_index, col_name in enumerate(df.columns):
+            cell = header_cells[col_index]
+            cell.text = col_name
+            # Formatação do cabeçalho
+            paragraph = cell.paragraphs[0]
+            paragraph.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER  # Centralizado
+            run = paragraph.runs[0]
+            run.bold = True  # Negrito
+            run.font.size = Pt(10)  # Tamanho da fonte
+
+        # Remove as linhas existentes (exceto o cabeçalho)
+        for row in table.rows[1:]:
+            tr = row._element
+            tr.getparent().remove(tr)
+
+        # Adiciona as novas linhas com os dados do DataFrame
+        for _, row in df.iterrows():
+            row_cells = table.add_row().cells
+            for col_index, value in enumerate(row):
+                cell = row_cells[col_index]
+                cell.text = str(value)
+                # Formatação das células
+                paragraph = cell.paragraphs[0]
+                paragraph.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER  # Centralizado
+                run = paragraph.runs[0]
+                run.font.size = Pt(10)  # Tamanho da fonte
+
+        # Adiciona bordas à tabela
+        self.add_table_borders(table)
 
 class SearchWindow(QDialog):
     def __init__(self, parent=None):
