@@ -131,19 +131,7 @@ class WindowCenterClinic:
             QMessageBox.information(self.parent, "Informação", f"Documentos serão salvos na pasta: {self.output_path}")
         else:
             QMessageBox.warning(self.parent, "Aviso", "Nenhuma pasta foi selecionada para salvar os documentos.")
-        # print(self.df.head())
-        # if self.df.empty:
-        #     QMessageBox.warning(self.parent, "Aviso", "Nenhum arquivo carregado!")
-        #     return None
-        # # mostrar qual checkbox está selecionado
-        # if self.checkbox_contrato_medico.isChecked():
-        #     print(f'Selecionar a função de contrato médico')
-
-        # if self.checkbox_aditivo.isChecked():
-        #     print(f'Selecionar a função de aditivo')
-
-        # if self.checkbox_contratoterapia.isChecked():
-        #     print(f'Selecionar a função de contrato terapia')
+        
     
     # Função para limpar o status
     def clear_status(self):
