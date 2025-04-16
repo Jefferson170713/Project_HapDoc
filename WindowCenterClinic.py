@@ -17,6 +17,7 @@ from PyQt5.QtWidgets import QWidget
 from datetime import datetime
 import os
 from ARQUIVOS.Oracle_Jdbc.jdbc_permission import JdbcPermission 
+from docx import Document
 
 class WindowCenterClinic:
     def __init__(self, parent=None):
@@ -24,6 +25,10 @@ class WindowCenterClinic:
         self.file_path = None
         self.output_path = None
         self.df = pd.DataFrame()
+        self.doc = Document()
+        self.count_contrat_meditate = 0
+        self.count_contrat_therapy = 0
+        self.count_aditivo = 0
     
     def create_center_clinic_tab(self, center_clinic):
         layout_center_clinic = QVBoxLayout()
@@ -106,25 +111,26 @@ class WindowCenterClinic:
         self.df = search_window.df_search  # Atribui o DataFrame ao self.df
 
     def process_and_save(self):
-        # Abre um diálogo para o usuário escolher o local para salvar o arquivo
+        # Abre um diálogo para o usuário escolher a pasta onde os arquivos serão salvos
         options = QFileDialog.Options()
         options |= QFileDialog.DontUseNativeDialog
-        file_path, _ = QFileDialog.getSaveFileName(
+        folder_path = QFileDialog.getExistingDirectory(
             self.parent,
-            "Salvar Arquivo",
-            "",
-            "Arquivos Excel (*.xlsx);;Todos os Arquivos (*)",
+            "Selecione a pasta para salvar os documentos",
             options=options
         )
-        if self.checkbox_contrato_medico.isChecked():
-            # Função de contrato médico (a ser implementada)
-            pass
-        # Verifica se o usuário selecionou um caminho
-        if file_path:
-            self.output_path = file_path  # Armazena o caminho em self.output_path
-            QMessageBox.information(self.parent, "Informação", f"Arquivo será salvo em: {self.output_path}")
+
+        # Verifica se o usuário selecionou uma pasta
+        if folder_path:
+            self.output_path = folder_path  # Armazena o caminho da pasta em self.output_path
+
+            # Verifica qual checkbox está selecionado e executa a função correspondente
+            if self.checkbox_contrato_medico.isChecked():
+                self.create_contract_meditate()
+
+            QMessageBox.information(self.parent, "Informação", f"Documentos serão salvos na pasta: {self.output_path}")
         else:
-            QMessageBox.warning(self.parent, "Aviso", "Nenhum local foi selecionado para salvar o arquivo.")
+            QMessageBox.warning(self.parent, "Aviso", "Nenhuma pasta foi selecionada para salvar os documentos.")
         # print(self.df.head())
         # if self.df.empty:
         #     QMessageBox.warning(self.parent, "Aviso", "Nenhum arquivo carregado!")
@@ -144,9 +150,69 @@ class WindowCenterClinic:
         self.label_status.setText("Nenhum arquivo carregado.")
 
     def create_contract_meditate(self):
-        # implementar a função de contrato médico
+        # Implementar a função de contrato médico
+        protocol = self.df['CD_PROTOCOLO'].unique()
+        path_document = r'./ARQUIVOS/CONTRATO AMBULATORIAL NDI RP.docx'
+        doc = Document(path_document)
+
+        # Salvando o arquivo
+        for protocolo in protocol:
+            # Criar o nome do arquivo baseado no protocolo
+            self.count_contrat_meditate += 1
+            df_protocol = self.df[self.df['CD_PROTOCOLO'] == protocolo]
+            name_file = f'{self.count_contrat_meditate} - CONTRATO MÉDICO_{protocolo}.docx'
+            name_string = df_protocol['NM_RAZAO_NOME'].iloc[0]  # Obtém o nome do DataFrame
+
+            # Atualiza o texto no documento
+            self.replace_text(doc, name_string=name_string)  # Substitui o texto no documento
+
+            # Definindo o caminho completo para salvar o arquivo
+            path_save = os.path.join(self.output_path, name_file)
+
+            # Salva o documento com o nome do protocolo
+            doc.save(path_save)
+
+        QMessageBox.information(self.parent, "Informação", f"Contratos médicos salvos na pasta: {self.output_path}")
+
+    # função para retornar a data de today em formato (dia, mês, ano)
+    def date_today(self, value):
+        # Obtém a data de today
+        today = datetime.now()
+        string_date = None
+        if value == 0:
+            date_complete = today.strftime('%d/%m/%Y')
+            date_complete = date_complete.replace('/', '_')
+            string_date = date_complete
         
-        ...
+        if value == 1:
+            day = today.day
+            month = today.month
+            dict_month = {
+                1: 'Janeiro', 2: 'Fevereiro', 3: 'Março', 4: 'Abril',
+                5: 'Maio', 6: 'Junho', 7: 'Julho', 8: 'Agosto',
+                9: 'Setembro', 10: 'Outubro', 11: 'Novembro', 12: 'Dezembro'
+            }
+            year = today.year
+            month = dict_month.get(month, 'Mês inválido')
+            string_date = f'{day} de {month} de {year}'
+
+        return string_date
+    
+    # Função para corrigir os nomes dos arquivos
+    def replace_text(self, doc, name_string):
+           # Dicionários de substituição
+        dict_replace = {
+            'XX de XXX de 20XX': self.date_today(1),
+            '@NOME@': name_string,
+        }
+        # Iterando pelos parágrafos
+        for pag, par in enumerate(doc.paragraphs):
+            # Substitui os textos do dicionário dict_replace
+            for key, value in dict_replace.items():
+                if key in par.text:
+                    for run in par.runs:
+                        if key in run.text:
+                            run.text = run.text.replace(key, value)
 
 class SearchWindow(QDialog):
     def __init__(self, parent=None):
