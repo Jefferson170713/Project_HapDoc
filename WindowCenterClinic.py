@@ -106,24 +106,47 @@ class WindowCenterClinic:
         self.df = search_window.df_search  # Atribui o DataFrame ao self.df
 
     def process_and_save(self):
-        print(self.df.head())
-        if self.df.empty:
-            QMessageBox.warning(self.parent, "Aviso", "Nenhum arquivo carregado!")
-            return None
-        # mostrar qual checkbox está selecionado
+        # Abre um diálogo para o usuário escolher o local para salvar o arquivo
+        options = QFileDialog.Options()
+        options |= QFileDialog.DontUseNativeDialog
+        file_path, _ = QFileDialog.getSaveFileName(
+            self.parent,
+            "Salvar Arquivo",
+            "",
+            "Arquivos Excel (*.xlsx);;Todos os Arquivos (*)",
+            options=options
+        )
         if self.checkbox_contrato_medico.isChecked():
-            print(f'Selecionar a função de contrato médico')
+            # Função de contrato médico (a ser implementada)
+            pass
+        # Verifica se o usuário selecionou um caminho
+        if file_path:
+            self.output_path = file_path  # Armazena o caminho em self.output_path
+            QMessageBox.information(self.parent, "Informação", f"Arquivo será salvo em: {self.output_path}")
+        else:
+            QMessageBox.warning(self.parent, "Aviso", "Nenhum local foi selecionado para salvar o arquivo.")
+        # print(self.df.head())
+        # if self.df.empty:
+        #     QMessageBox.warning(self.parent, "Aviso", "Nenhum arquivo carregado!")
+        #     return None
+        # # mostrar qual checkbox está selecionado
+        # if self.checkbox_contrato_medico.isChecked():
+        #     print(f'Selecionar a função de contrato médico')
 
-        if self.checkbox_aditivo.isChecked():
-            print(f'Selecionar a função de aditivo')
+        # if self.checkbox_aditivo.isChecked():
+        #     print(f'Selecionar a função de aditivo')
 
-        if self.checkbox_contratoterapia.isChecked():
-            print(f'Selecionar a função de contrato terapia')
-    
+        # if self.checkbox_contratoterapia.isChecked():
+        #     print(f'Selecionar a função de contrato terapia')
     
     # Função para limpar o status
     def clear_status(self):
         self.label_status.setText("Nenhum arquivo carregado.")
+
+    def create_contract_meditate(self):
+        # implementar a função de contrato médico
+        
+        ...
 
 class SearchWindow(QDialog):
     def __init__(self, parent=None):
