@@ -146,19 +146,44 @@ class WindowCenterClinic:
         protocol = self.df['CD_PROTOCOLO'].unique()
         path_document = r'./ARQUIVOS/CONTRATO AMBULATORIAL NDI RP.docx'
         #doc = Document(path_document)
-        df_temp = self.df.copy()
+        df_especialidade = pd.read_csv(r'./ARQUIVOS/ESPECIALIDADE.csv', sep=';', encoding='latin1')
         # Salvando o arquivo
         for protocolo in protocol:
             # Criar o nome do arquivo baseado no protocolo
             doc = Document(path_document)
             self.count_contrat_meditate += 1
-            df_protocol = self.df[df_temp['CD_PROTOCOLO'] == protocolo].copy()  # Filtra o DataFrame para o protocolo atual
+            df_protocol = self.df[self.df['CD_PROTOCOLO'] == protocolo].copy()  # Filtra o DataFrame para o protocolo atual
             name_string = df_protocol['NM_RAZAO_NOME'].iloc[0]  # Obtém o nome do DataFrame
             name_file = f'{self.count_contrat_meditate} - CONTRATO MÉDICO_{protocolo}.docx'
 
             # Atualiza o texto no documento
             self.replace_text(doc, name_string)  # Substitui o texto no documento
             print(name_string, protocolo)
+
+            df_protocol = pd.merge(df_protocol, df_especialidade, how='left', left_on='CD_ESPECIALIDADE', right_on='COD_ESPECIALIDADE')
+            df_protocol.CD_ORDEM_LOCAL = df_protocol.CD_ORDEM_LOCAL.astype(str).str.replace('.0', '', regex=False)
+            df_protocol.CD_ORDEM_LOCAL = df_protocol.CD_ORDEM_LOCAL.astype(int)
+            df = df_protocol[['ESPECIALIDADE', 'VL_HORA_PROPOSTO', 'NM_FANTASIA','CIDADE_UF']].copy()
+            # df.DS_ESPECIALIDADE = df.DS_ESPECIALIDADE.str.capitalize()
+            # df['CIDADE'] = df.CIDADE_UF.str.split('/').str[0].str.capitalize()
+            # df['UF'] = df.CIDADE_UF.str.split('/').str[1].str.upper()
+            # df.CIDADE_UF = df.CIDADE + '/' + df.UF
+            # df.drop(columns=['CIDADE', 'UF'], inplace=True)
+            df.sort_values(by=[ 'VL_HORA_PROPOSTO', 'CIDADE_UF'], ascending=[True, True], inplace=True)
+            df.drop_duplicates(inplace=True)
+            # df com após a virgula de duas unidades
+            df.VL_HORA_PROPOSTO = df.VL_HORA_PROPOSTO.apply(lambda x: f"R$ {x:,.2f}".replace('.', ','))
+            df.rename(
+            columns={
+                'ESPECIALIDADE': 'ESPECIALIDADE',
+                'VL_HORA_PROPOSTO': 'VALOR HORA', 
+                'NM_FANTASIA': 'LOCAL', 
+                'CIDADE_UF': 'CIDADE/UF'
+                }, 
+            inplace=True
+            )
+            print(df.head(1), '\n')
+            self.replace_table_content(doc=doc, table_index=2, df=df)  # Substitui o conteúdo da tabela
 
             # Definindo o caminho completo para salvar o arquivo
             path_save = os.path.join(self.output_path, name_file)
@@ -224,9 +249,6 @@ class WindowCenterClinic:
 
     # Função para substituir o conteúdo de uma tabela específica
     def replace_table_content(self, doc, table_index, df):
-        # As tratativas do df, devem acontecer aqui.
-        # TRATATIVAS DO DATAFRAME
-        # Localiza a tabela pelo índice
         table = doc.tables[table_index]
 
         # Substitui o cabeçalho da tabela
