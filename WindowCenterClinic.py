@@ -156,6 +156,8 @@ class WindowCenterClinic:
             name_string = df_protocol['NM_RAZAO_NOME'].iloc[0]  # Obtém o nome do DataFrame
             name_file = f'{self.count_contrat_meditate} - CONTRATO MÉDICO_{protocolo}.docx'
 
+            # inserindo o protocolo no documento 
+            self.replace_in_headers(doc=doc, old_word="XXX_XXX", new_word=str(protocolo))  # Substitui o texto no cabeçalho
             # Atualiza o texto no documento
             self.replace_text(doc, name_string)  # Substitui o texto no documento
             print(name_string, protocolo)
