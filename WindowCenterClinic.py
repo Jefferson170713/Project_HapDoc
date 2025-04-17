@@ -191,7 +191,6 @@ class WindowCenterClinic:
             # Salva o documento com o nome do protocolo
             doc.save(path_save)
 
-        QMessageBox.information(self.parent, "Informação", f"Contratos médicos salvos na pasta: {self.output_path}")
 
     # função para retornar a data de today em formato (dia, mês, ano)
     def date_today(self, value):
@@ -282,6 +281,16 @@ class WindowCenterClinic:
 
         # Adiciona bordas à tabela
         self.add_table_borders(table)
+    
+    # Função para substituir palavras nos cabeçalhos sem mudar o conteúdo
+    def replace_in_headers(self, doc, old_word, new_word):
+        for section in doc.sections:
+            header = section.header
+            for paragraph in header.paragraphs:
+                for run in paragraph.runs:
+                    if old_word in run.text: # Verifica se o texto antigo está na run
+                        run.text = run.text.replace(old_word, new_word) # Substitui o texto na run
+
 
 class SearchWindow(QDialog):
     def __init__(self, parent=None):
