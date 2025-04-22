@@ -7,36 +7,40 @@
     <title>HapDoc</title>
 </head>
 <body>
+    <!-- Menu -->
     <div class="menu">
         <ul>
-            <li><a href="#" id="menu-procedures">Pacotes e Procedimentos</a></li>
-            <li><a href="#" id="menu-clinic">Centro Clínico</a></li>
+            <li><a href="#" id="menu-procedures"><img class="pacote-procedure" src="../img/pacote-procedimento.svg" alt="Pacotes e Procedimentos"></img> Pacotes e Procedimentos</a></li>
+            <li><a href="#" id="menu-clinic"><img class="menu-clinic" src="../img/centro-clinico.svg" alt="Centro Clínico"></img> Centro Clínico</a></li>
         </ul>
     </div>
 
+    <!-- Conteúdo -->
     <div class="content">
-        <button id="clear-status">Limpar Status</button>
+        <button id="clear-status"><img class="clear" src="../img/to_clean_eraser.svg" alt="Limpar status"></img> Limpar Status</button>
         <div class="table-container">
             <table id="data-table">
                 <thead>
                     <tr>
-                        <th>Coluna 1</th>
-                        <th>Coluna 2</th>
-                        <th>Coluna 3</th>
+                        <th>ANO_TABELA</th>
+                        <th>COD_AUTORIZAÇÃO</th>
+                        <th>COD_TUSS</th>
+                        <th>NOMENCLATURA</th>
+                        <th>VALOR</th>
+                        <th>CD_TIPO_ACOMODACAO</th>
+                        <th>URG_ELE_TAX_MAT_MED_CH_ANE_AUX</th>
+                        <th>QTD_REDES</th>
+                        <th>CD_TIPO_REDE</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>Dados 1</td>
-                        <td>Dados 2</td>
-                        <td>Dados 3</td>
-                    </tr>
+                    <!-- Dados serão preenchidos dinamicamente -->
                 </tbody>
             </table>
         </div>
         <div class="buttons">
-            <button id="select-file">Selecionar Arquivo</button>
-            <button id="save-file">Salvar</button>
+            <button id="select-file"><img class="select-file-user" src="../img/folder_select_file.svg" alt="Selecionar Arquivo"></img> Selecionar Arquivo</button>
+            <button id="save-file" class="button-save"><img class="save-path-user" src="../img/save-file.svg" alt="Salvar"></img> Salvar</button>
         </div>
     </div>
 
