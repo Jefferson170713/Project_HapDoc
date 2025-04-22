@@ -10,7 +10,7 @@ class HapDoc(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("HapDoc")
-        self.setGeometry(100, 100, 700, 400)  # Ajuste o tamanho da janela
+        self.setGeometry(100, 100, 800, 500)  # Ajuste o tamanho da janela
         self.setWindowIcon(QIcon("./ARQUIVOS/logo/logo.ico"))
         self.initUI()
 
@@ -19,7 +19,7 @@ class HapDoc(QMainWindow):
         self.webview = QWebEngineView()
 
         # Caminho para o arquivo HTML
-        path = os.path.abspath("./ARQUIVOS/layout/html/index_hapdoc.html")
+        path = os.path.abspath("./layout/html/index_hapdoc.html")
         self.webview.setUrl(QUrl.fromLocalFile(path))
 
         # Adiciona o QWebEngineView à janela principal
