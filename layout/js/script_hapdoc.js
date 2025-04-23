@@ -29,8 +29,10 @@ document.querySelectorAll("#data-table th").forEach((header, index) => {
 });
 
 document.getElementById("menu-clinic").addEventListener("click", function (event) {
-    event.preventDefault(); // Evita o comportamento padrão do link
+    event.preventDefault(); // Evita o comportamento padrão do botão
 
     const submenu = document.getElementById("clinic-options");
-    submenu.classList.toggle("show"); // Alterna a classe "show"
+
+    // Alterna a classe "show" para exibir ou ocultar o submenu
+    submenu.classList.toggle("show");
 });
