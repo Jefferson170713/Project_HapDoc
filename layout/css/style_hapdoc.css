@@ -138,7 +138,7 @@ table th {
     background: #555; /* Cor ao passar o mouse */
 }
 
-/* .menu-clinic {
+.menu-clinic {
     width: 20px; 
     height: 20px;
     vertical-align: middle; 
@@ -155,7 +155,7 @@ table th {
     height: 20px;
     vertical-align: middle;
     margin-right: 8px;
-} */
+}
 
 .pacote-procedure {
     width: 20px; /* Ajuste o tamanho da imagem */
@@ -195,39 +195,4 @@ table th {
     align-items: center; /* Alinha verticalmente o conteúdo */
     justify-content: center; /* Centraliza o conteúdo horizontalmente */
     gap: 8px; /* Espaçamento entre o ícone e o texto */
-}
-/* submenu */
-.submenu {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: none; /* Oculta o submenu inicialmente */
-    position: absolute;
-    top: 100%; /* Posiciona abaixo do item principal */
-    left: 0;
-    background-color: #0056b3; /* Fundo azul */
-    border-radius: 5px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-    z-index: 10;
-    width: 200px; /* Largura do submenu */
-}
-
-.submenu li {
-    padding: 10px;
-    text-align: left;
-}
-
-.submenu li a {
-    text-decoration: none;
-    color: white; /* Letras brancas */
-    display: block;
-}
-
-.submenu li a:hover {
-    background-color: #007BFF; /* Fundo azul mais claro no hover */
-}
-
-/* Classe para exibir o submenu */
-.submenu.show {
-    display: block; /* Exibe o submenu */
 }

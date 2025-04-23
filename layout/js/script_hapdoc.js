@@ -27,12 +27,3 @@ document.querySelectorAll("#data-table th").forEach((header, index) => {
         rows.forEach(row => table.appendChild(row));
     });
 });
-
-document.getElementById("menu-clinic").addEventListener("click", function (event) {
-    event.preventDefault(); // Evita o comportamento padrão do botão
-
-    const submenu = document.getElementById("clinic-options");
-
-    // Alterna a classe "show" para exibir ou ocultar o submenu
-    submenu.classList.toggle("show");
-});
