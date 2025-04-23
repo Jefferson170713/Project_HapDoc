@@ -10,8 +10,26 @@
     <!-- Menu -->
     <div class="menu">
         <ul>
-            <li><a href="#" id="menu-procedures"><img class="pacote-procedure" src="../img/pacote-procedimento.svg" alt="Pacotes e Procedimentos"></img> Pacotes e Procedimentos</a></li>
-            <li><a href="#" id="menu-clinic"><img class="menu-clinic" src="../img/centro-clinico.svg" alt="Centro Clínico"></img> Centro Clínico</a></li>
+            <!-- Item 1: Pacotes e Procedimentos -->
+            <li>
+                <a href="#" id="menu-procedures">
+                    <img class="pacote-procedure" src="../img/pacote-procedimento.svg" alt="Pacotes e Procedimentos"></img>
+                    Pacotes e Procedimentos
+                </a>
+            </li>
+    
+            <!-- Item 2: Centro Clínico com Dropdown -->
+            <li class="dropdown">
+                <a href="#" id="menu-clinic">
+                    <img class="menu-clinic" src="../img/centro-clinico.svg" alt="Centro Clínico"></img>
+                    Centro Clínico
+                </a>
+                <ul id="clinic-options" class="submenu hidden">
+                    <li><a href="#" id="aditivo">Aditivo</a></li>
+                    <li><a href="#" id="contrato-medico">Contrato Médico</a></li>
+                    <li><a href="#" id="contrato-terapia">Contrato Terapia</a></li>
+                </ul>
+            </li>
         </ul>
     </div>
 
@@ -34,7 +52,12 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <!-- Dados serão preenchidos dinamicamente -->
+                    <tr><td colspan="9" class="empty-row"></td></tr>
+                    <tr><td colspan="9" class="empty-row"></td></tr>
+                    <tr><td colspan="9" class="empty-row"></td></tr>
+                    <tr><td colspan="9" class="empty-row"></td></tr>
+                    <tr><td colspan="9" class="empty-row"></td></tr>
+
                 </tbody>
             </table>
         </div>

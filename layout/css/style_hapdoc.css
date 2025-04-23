@@ -3,12 +3,19 @@ body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #F4EFEF;
+    /* background-color: #F4EFEF; */
+    background-image: url('../img/background_2.png'); 
+    background-size:800px 500px; /* Define o tamanho da imagem de fundo */
+    background-size: cover; /* Faz a imagem cobrir todo o fundo */
+    background-repeat: no-repeat;
+    /* background-position: center;  */
+    /* Preciso que a imagem tenha um tamanho de 800 por 500 */
 }
 
 /* Menu */
+/* Estilo geral do menu */
 .menu {
-    background-color: #0056b3;
+    background-color: #0056b3; /* Fundo azul do menu */
     padding: 10px 0;
     text-align: center;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
@@ -20,26 +27,24 @@ body {
     padding: 0;
     display: flex;
     justify-content: center;
+    gap: 20px;
 }
 
 .menu ul li {
-    margin: 0 15px;
+    position: relative; /* Necessário para o dropdown */
 }
 
 .menu ul li a {
-    color: white;
     text-decoration: none;
-    font-size: 18px;
-    padding: 10px 20px;
-    border-radius: 5px;
-    transition: background-color 0.3s ease;
+    color: white;
+    font-size: 16px;
     display: flex;
     align-items: center;
     gap: 8px;
 }
 
 .menu ul li a:hover {
-    background-color: #007BFF;
+    text-decoration: underline;
 }
 
 /* Conteúdo */
@@ -67,42 +72,66 @@ button {
 button:hover {
     background-color: #007BFF;
 }
-
 /* Tabela */
 .table-container {
-    margin: 20px auto;
+    margin: 2px auto;
     max-width: 100%;
-    overflow-x: auto;
+    overflow-y: auto; /* Permite rolagem vertical */
+    overflow-x: auto; /* Permite rolagem horizontal */
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    height: 200px; /* Altura fixa para exibir 5 linhas */
 }
 
 table {
     width: 100%;
     border-collapse: collapse;
-    margin: 15px 0;
-    background-color: white;
+    background-color: transparent; /* Fundo transparente */
     font-size: 14px;
 }
 
 table th, table td {
-    border: 1px solid #ddd;
+    border: 1px solid rgba(0, 0, 0, 0.1); /* Bordas suaves */
     padding: 4px;
     text-align: center;
 }
 
 table th {
-    background-color: #F1471D;
+    background-color: #F1471D; /* Cabeçalho com cor */
     color: white;
     font-weight: bold;
+    position: sticky; /* Fixa o cabeçalho ao rolar */
+    top: 0;
+    z-index: 1;
 }
 
-table tr:nth-child(even) {
-    background-color: #f2f2f2;
+.empty-row {
+    background-color: transparent; /* Fundo transparente para linhas vazias */
+    height: 40px; /* Altura fixa para cada linha */
+}
+/* Barra de rolagem da tabela */
+/* Estilo para a barra de rolagem */
+.table-container::-webkit-scrollbar {
+    width: 8px; /* Largura da barra de rolagem vertical */
+    height: 8px; /* Altura da barra de rolagem horizontal */
 }
 
-table tr:hover {
-    background-color: #ddd;
+/* Cor do fundo da barra de rolagem */
+.table-container::-webkit-scrollbar-track {
+    background: #f4f4f4; /* Cor do fundo da barra */
+    border-radius: 10px; /* Bordas arredondadas */
 }
+
+/* Cor da barra de rolagem */
+.table-container::-webkit-scrollbar-thumb {
+    background: #888; /* Cor da barra */
+    border-radius: 10px; /* Bordas arredondadas */
+}
+
+/* Cor da barra de rolagem ao passar o mouse */
+.table-container::-webkit-scrollbar-thumb:hover {
+    background: #555; /* Cor ao passar o mouse */
+}
+
 .menu-clinic {
     width: 20px; /* Ajuste o tamanho da imagem */
     height: 20px;
@@ -159,4 +188,39 @@ table tr:hover {
     align-items: center; /* Alinha verticalmente o conteúdo */
     justify-content: center; /* Centraliza o conteúdo horizontalmente */
     gap: 8px; /* Espaçamento entre o ícone e o texto */
+}
+/* submenu */
+/* Estilo do submenu (dropdown) */
+.submenu {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: none; /* Oculta o submenu inicialmente */
+    position: absolute;
+    top: 100%; /* Posiciona abaixo do item principal */
+    left: 0;
+    background-color: #0056b3; /* Fundo azul */
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    z-index: 10;
+}
+
+.submenu li {
+    padding: 10px;
+    text-align: left;
+}
+
+.submenu li a {
+    text-decoration: none;
+    color: white; /* Letras brancas */
+    display: block;
+}
+
+.submenu li a:hover {
+    background-color: #007BFF; /* Fundo azul mais claro no hover */
+}
+
+/* Classe para exibir o submenu */
+.submenu.show {
+    display: block;
 }

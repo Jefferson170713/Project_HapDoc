@@ -1,23 +1,36 @@
 // Função para limpar o status
-document.getElementById("clear-status").addEventListener("click", function () {
-    alert("Status limpo!");
+document.querySelectorAll("#data-table th").forEach((header, index) => {
+    header.addEventListener("click", () => {
+        const table = document.querySelector("#data-table tbody");
+        const rows = Array.from(table.rows);
+
+        // Alterna entre ascendente e descendente
+        const isAscending = header.classList.toggle("asc");
+        header.classList.toggle("desc", !isAscending);
+
+        // Remove classes de outros cabeçalhos
+        document.querySelectorAll("#data-table th").forEach(th => {
+            if (th !== header) th.classList.remove("asc", "desc");
+        });
+
+        // Ordena as linhas
+        rows.sort((a, b) => {
+            const aText = a.cells[index].textContent.trim();
+            const bText = b.cells[index].textContent.trim();
+
+            return isAscending
+                ? aText.localeCompare(bText, undefined, { numeric: true })
+                : bText.localeCompare(aText, undefined, { numeric: true });
+        });
+
+        // Reinsere as linhas ordenadas
+        rows.forEach(row => table.appendChild(row));
+    });
 });
 
-// Função para selecionar arquivo
-document.getElementById("select-file").addEventListener("click", function () {
-    alert("Selecionar arquivo clicado!");
-});
+document.getElementById("menu-clinic").addEventListener("click", function (event) {
+    event.preventDefault(); // Evita o comportamento padrão do link
 
-// Função para salvar arquivo
-document.getElementById("save-file").addEventListener("click", function () {
-    alert("Salvar arquivo clicado!");
-});
-
-// Menu interativo (opcional)
-document.getElementById("menu-procedures").addEventListener("click", function () {
-    alert("Pacotes e Procedimentos selecionado!");
-});
-
-document.getElementById("menu-clinic").addEventListener("click", function () {
-    alert("Centro Clínico selecionado!");
+    const submenu = document.getElementById("clinic-options");
+    submenu.classList.toggle("show"); // Alterna a classe "show"
 });
