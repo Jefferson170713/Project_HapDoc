@@ -56,11 +56,17 @@
             </table>
         </div>
         <div class="buttons">
-            <button id="select-file"><img class="select-file-user" src="../img/folder_select_file.svg" alt="Selecionar Arquivo"></img> Selecionar Arquivo</button>
+            <button id="select-file">
+                <img class="select-file-user" src="../img/folder_select_file.svg" alt="Selecionar Arquivo"></img>
+                Selecionar Arquivo
+            </button>
+            <input type="file" id="file-input" accept=".csv" style="display: none;">
+            <!-- <button id="select-file"><img class="select-file-user" src="../img/folder_select_file.svg" alt="Selecionar Arquivo"></img> Selecionar Arquivo</button> -->
             <button id="save-file" class="button-save"><img class="save-path-user" src="../img/save-file.svg" alt="Salvar"></img> Salvar</button>
         </div>
     </div>
 
+    <script src="qwebchannel.js"></script>
     <script src="../js/script_hapdoc.js"></script>
 </body>
 </html>
