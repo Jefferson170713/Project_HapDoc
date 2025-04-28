@@ -137,6 +137,10 @@ class WindowCenterClinic:
                 path_document = r'./ARQUIVOS/CONTRATO AMBULATORIAL NDI RP.docx'
                 self.create_contract(path_document, name_arq='CONTRATO MÉDICO NDI')
 
+            if self.checkbox_contratoterapia.isChecked():
+                path_document = r'./ARQUIVOS/CONTRATO EQUIPE MULTIDISCIPLINAR NDI RP.docx'
+                self.create_contract(path_document, name_arq='CONTRATO TERAPIA NDI')
+
             QMessageBox.information(self.parent, "Informação", f"Documentos serão salvos na pasta: {self.output_path}")
         else:
             QMessageBox.warning(self.parent, "Aviso", "Nenhuma pasta foi selecionada para salvar os documentos.")
