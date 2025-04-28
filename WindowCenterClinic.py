@@ -129,8 +129,13 @@ class WindowCenterClinic:
             self.output_path = folder_path  # Armazena o caminho da pasta em self.output_path
 
             # Verifica qual checkbox está selecionado e executa a função correspondente
+            if self.checkbox_aditivo.isChecked():
+                path_document = r'./ARQUIVOS/ADENDO NDI SP NDI RP.docx'
+                self.create_contract(path_document, name_arq='ADENDO NDI SP NDI')
+
             if self.checkbox_contrato_medico.isChecked():
-                self.create_contract_meditate()
+                path_document = r'./ARQUIVOS/CONTRATO AMBULATORIAL NDI RP.docx'
+                self.create_contract(path_document, name_arq='CONTRATO MÉDICO NDI')
 
             QMessageBox.information(self.parent, "Informação", f"Documentos serão salvos na pasta: {self.output_path}")
         else:
@@ -141,10 +146,10 @@ class WindowCenterClinic:
     def clear_status(self):
         self.label_status.setText("Nenhum arquivo carregado.")
 
-    def create_contract_meditate(self):
+    def create_contract(self, path_document, name_arq):
         # Implementar a função de contrato médico
         protocol = self.df['CD_PROTOCOLO'].unique()
-        path_document = r'./ARQUIVOS/CONTRATO AMBULATORIAL NDI RP.docx'
+        #path_document = r'./ARQUIVOS/CONTRATO AMBULATORIAL NDI RP.docx'
         #doc = Document(path_document)
         df_especialidade = pd.read_csv(r'./ARQUIVOS/ESPECIALIDADE.csv', sep=';', encoding='latin1')
         # Salvando o arquivo
@@ -155,7 +160,8 @@ class WindowCenterClinic:
             df_protocol = self.df[self.df['CD_PROTOCOLO'] == protocolo].copy()  # Filtra o DataFrame para o protocolo atual
             name_string = df_protocol['NM_RAZAO_NOME'].iloc[0]  # Obtém o nome do DataFrame
             date_doc = df_protocol['DT_INI_VIGENCIA'].iloc[0]  # Obtém a data do DataFrame
-            name_file = f'{self.count_contrat_meditate} - CONTRATO MÉDICO_{protocolo}.docx'
+
+            name_file = f'{self.count_contrat_meditate} - {name_arq}_{protocolo}.docx'
 
             # inserindo o protocolo no documento 
             self.replace_in_headers(doc=doc, old_word="XXX_XXX", new_word=str(protocolo))  # Substitui o texto no cabeçalho
