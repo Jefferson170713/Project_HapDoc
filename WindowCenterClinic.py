@@ -154,12 +154,13 @@ class WindowCenterClinic:
             self.count_contrat_meditate += 1
             df_protocol = self.df[self.df['CD_PROTOCOLO'] == protocolo].copy()  # Filtra o DataFrame para o protocolo atual
             name_string = df_protocol['NM_RAZAO_NOME'].iloc[0]  # Obtém o nome do DataFrame
+            date_doc = df_protocol['DT_INI_VIGENCIA'].iloc[0]  # Obtém a data do DataFrame
             name_file = f'{self.count_contrat_meditate} - CONTRATO MÉDICO_{protocolo}.docx'
 
             # inserindo o protocolo no documento 
             self.replace_in_headers(doc=doc, old_word="XXX_XXX", new_word=str(protocolo))  # Substitui o texto no cabeçalho
             # Atualiza o texto no documento
-            self.replace_text(doc, name_string)  # Substitui o texto no documento
+            self.replace_text(doc, name_string, date_doc)  # Substitui o texto no documento
             print(name_string, protocolo)
 
             df_protocol = pd.merge(df_protocol, df_especialidade, how='left', left_on='CD_ESPECIALIDADE', right_on='COD_ESPECIALIDADE')
@@ -195,7 +196,7 @@ class WindowCenterClinic:
 
 
     # função para retornar a data de today em formato (dia, mês, ano)
-    def date_today(self, value):
+    def date_today(self, value, date_doc):
         # Obtém a data de today
         today = datetime.now()
         string_date = None
@@ -205,24 +206,26 @@ class WindowCenterClinic:
             string_date = date_complete
         
         if value == 1:
-            day = today.day
-            month = today.month
+            date_doc = datetime.strptime(date_doc, '%Y-%m-%d %H:%M:%S')
+            string_date = date_doc.strftime('%d/%m/%Y')
+            day = date_doc.day
+            month = date_doc.month
             dict_month = {
-                1: 'Janeiro', 2: 'Fevereiro', 3: 'Março', 4: 'Abril',
-                5: 'Maio', 6: 'Junho', 7: 'Julho', 8: 'Agosto',
-                9: 'Setembro', 10: 'Outubro', 11: 'Novembro', 12: 'Dezembro'
+                1: 'janeiro', 2: 'fevereiro', 3: 'março', 4: 'abril',
+                5: 'maio', 6: 'junho', 7: 'julho', 8: 'agosto',
+                9: 'setembro', 10: 'outubro', 11: 'novembro', 12: 'dezembro'
             }
-            year = today.year
+            year = date_doc.year
             month = dict_month.get(month, 'Mês inválido')
             string_date = f'{day} de {month} de {year}'
 
         return string_date
     
     # Função para corrigir os nomes dos arquivos
-    def replace_text(self, doc, name_string):
+    def replace_text(self, doc, name_string, date_doc):
            # Dicionários de substituição
         dict_replace = {
-            'XX de XXX de 20XX': self.date_today(1),
+            'XX de XXX de 20XX': self.date_today(1, date_doc),
             '@NOME@': name_string,
         }
         # Iterando pelos parágrafos
