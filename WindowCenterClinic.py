@@ -395,15 +395,20 @@ class SearchWindow(QDialog):
                 jdbc_permission = JdbcPermission(path_drive)
 
                 # Usa o método fetch_data para buscar os dados
-                df = jdbc_permission.fetch_data(search_term)
+                df, protocol = jdbc_permission.fetch_data(search_term)
 
+                cd_protocol = df.CD_PROTOCOLO.unique().tolist()
+
+                protocol = protocol.split(', ')
+
+                protocol = [int(p) for p in protocol]  # Converte os protocolos para inteiros
+
+                protocol_diff = list(set(protocol) - set(cd_protocol))
+
+                print(protocol, cd_protocol, protocol_diff)
 
                 # Atualiza o self.df_search com os dados encontrados
                 self.df_search = df
-
-                if self.df_search.empty:
-                    QMessageBox.warning(self, "Aviso", "Protocolo inelegível para automatização de documentos. \n\nSolicita-se verificação com a coordenação.")
-
                 # Define o número de linhas e colunas da tabela com base no DataFrame
                 self.table.setRowCount(len(df))
                 self.table.setColumnCount(len(df.columns))
@@ -413,6 +418,14 @@ class SearchWindow(QDialog):
                 for row_idx, row_data in df.iterrows():
                     for col_idx, cell_data in enumerate(row_data):
                         self.table.setItem(row_idx, col_idx, QTableWidgetItem(str(cell_data)))
+
+                if self.df_search.empty:
+                    QMessageBox.warning(self, 'Aviso', f'Protocolo(s): ( {protocol} ) inelegível para automatização de documentos. \n\nSolicita-se verificação com a coordenação.')
+
+                if len(protocol) != len(cd_protocol):
+                    protocol_diff = ', '.join([str(p) for p in protocol_diff])
+                    QMessageBox.warning(self, 'Aviso', f'Protocolo(s): ( {protocol_diff} ) inelegível para automatização de documentos. \n\nSolicita-se verificação com a coordenação.')
+
 
             except Exception as erro:
                 QMessageBox.critical(self, "Erro", f"Erro ao buscar dados:\n{str(erro)}")
