@@ -131,15 +131,15 @@ class WindowCenterClinic:
             # Verifica qual checkbox está selecionado e executa a função correspondente
             if self.checkbox_aditivo.isChecked():
                 path_document = r'./ARQUIVOS/ADENDO NDI SP NDI RP.docx'
-                self.create_contract(path_document, name_arq='ADENDO NDI SP NDI')
+                self.count_aditivo = self.create_contract(path_document, name_arq='ADENDO NDI SP NDI', count_contract=self.count_aditivo)
 
             if self.checkbox_contrato_medico.isChecked():
                 path_document = r'./ARQUIVOS/CONTRATO AMBULATORIAL NDI RP.docx'
-                self.create_contract(path_document, name_arq='CONTRATO MÉDICO NDI')
+                self.count_contrat_meditate = self.create_contract(path_document, name_arq='CONTRATO MÉDICO NDI', count_contract=self.count_contrat_meditate)
 
             if self.checkbox_contratoterapia.isChecked():
                 path_document = r'./ARQUIVOS/CONTRATO EQUIPE MULTIDISCIPLINAR NDI RP.docx'
-                self.create_contract(path_document, name_arq='CONTRATO TERAPIA NDI')
+                self.count_contrat_therapy = self.create_contract(path_document, name_arq='CONTRATO TERAPIA NDI', count_contract=self.count_contrat_therapy)
 
             QMessageBox.information(self.parent, "Informação", f"Documentos serão salvos na pasta: {self.output_path}")
         else:
@@ -148,9 +148,10 @@ class WindowCenterClinic:
     
     # Função para limpar o status
     def clear_status(self):
+        #self.df = pd.DataFrame()
         self.label_status.setText("Nenhum arquivo carregado.")
 
-    def create_contract(self, path_document, name_arq):
+    def create_contract(self, path_document, name_arq, count_contract):
         # Implementar a função de contrato médico
         protocol = self.df['CD_PROTOCOLO'].unique()
         #path_document = r'./ARQUIVOS/CONTRATO AMBULATORIAL NDI RP.docx'
@@ -160,12 +161,12 @@ class WindowCenterClinic:
         for protocolo in protocol:
             # Criar o nome do arquivo baseado no protocolo
             doc = Document(path_document)
-            self.count_contrat_meditate += 1
+            count_contract += 1
             df_protocol = self.df[self.df['CD_PROTOCOLO'] == protocolo].copy()  # Filtra o DataFrame para o protocolo atual
             name_string = df_protocol['NM_RAZAO_NOME'].iloc[0]  # Obtém o nome do DataFrame
             date_doc = df_protocol['DT_INI_VIGENCIA'].iloc[0]  # Obtém a data do DataFrame
 
-            name_file = f'{self.count_contrat_meditate} - {name_arq}_{protocolo}.docx'
+            name_file = f'{count_contract} - {name_arq}_{protocolo}.docx'
 
             # inserindo o protocolo no documento 
             self.replace_in_headers(doc=doc, old_word="XXX_XXX", new_word=str(protocolo))  # Substitui o texto no cabeçalho
@@ -203,6 +204,8 @@ class WindowCenterClinic:
 
             # Salva o documento com o nome do protocolo
             doc.save(path_save)
+
+        return count_contract
 
 
     # função para retornar a data de today em formato (dia, mês, ano)
