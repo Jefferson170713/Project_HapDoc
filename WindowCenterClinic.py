@@ -402,7 +402,7 @@ class SearchWindow(QDialog):
                 self.df_search = df
 
                 if self.df_search.empty:
-                    QMessageBox.warning(self, "Aviso", "Protocolo inelegível para automatização de documentos. \nSolicita-se verificação com a coordenação.")
+                    QMessageBox.warning(self, "Aviso", "Protocolo inelegível para automatização de documentos. \n\nSolicita-se verificação com a coordenação.")
 
                 # Define o número de linhas e colunas da tabela com base no DataFrame
                 self.table.setRowCount(len(df))
