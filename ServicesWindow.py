@@ -18,7 +18,8 @@ from PyQt5.QtWidgets import QWidget
 from PyQt5.QtWidgets import QTextEdit
 from datetime import datetime
 import os
-from SearchWindow import SearchWindow
+#from SearchWindow import SearchWindow
+from ARQUIVOS.Oracle_Jdbc.jdbc_teste_02 import JdbcPermission 
 
 class ServicesWindow:
     def __init__(self, parent=None):
@@ -163,4 +164,129 @@ class ServicesWindow:
     def clear_status(self):
         self.label_status.setText("Nenhum arquivo carregado.")
         self.text_edit_info.clear()
-        
+
+class SearchWindow(QDialog):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle("Pesquisar Dados")
+        self.setFixedSize(600, 400)  # Tamanho fixo da janela
+        self.init_ui()
+        self.df_search = pd.DataFrame()  # DataFrame para armazenar os dados pesquisados
+        self.parent = parent  # Armazena a referência ao widget pai
+        #elf.progress_bar_process_search = None
+
+    def init_ui(self):
+        # Cria o layout principal
+        main_layout = QVBoxLayout()
+
+        # Linha para entrada de texto e botão de pesquisa
+        search_layout = QHBoxLayout()
+        self.search_input = QLineEdit()
+        self.search_input.setPlaceholderText("Digite os Protocolos...")
+        search_layout.addWidget(self.search_input)
+
+        btn_search = QPushButton("Pesquisar")
+        btn_search.setFixedSize(100, 30)
+        btn_search.clicked.connect(self.perform_search)  # Conecta à função de pesquisa
+        search_layout.addWidget(btn_search)
+
+        # Barra de progresso (agora como atributo da classe)
+        self.progress_bar_process_search = QProgressBar()
+        self.progress_bar_process_search.setValue(0)
+        self.progress_bar_process_search.setMinimum(0)
+        self.progress_bar_process_search.setMaximum(100)
+        main_layout.addWidget(self.progress_bar_process_search)
+
+
+        main_layout.addLayout(search_layout)
+
+        # Separador
+        separator1 = QFrame()
+        separator1.setFrameShape(QFrame.HLine)
+        separator1.setFrameShadow(QFrame.Sunken)
+        main_layout.addWidget(separator1)
+
+        # Tabela para exibir os resultados
+        self.table = QTableWidget()
+        self.table.setColumnCount(15)  # Define 15 colunas
+        self.table.setHorizontalHeaderLabels([
+            'CD_PROTOCOLO', 'CD_SERV_HONORARIO', 'CD_PROCEDIMENTO_TUSS', 'CD_ANO',
+            'DT_STATUS', 'NM_PROCEDIMENTO', 'NM_PROCEDIMENTO_TUSS', 'REDE',
+            'VL_PROPOSTO', 'VL_DEFLATOR', 'VL_DEFLATOR_UCO', 'VL_FILME_PROPOSTO',
+            'CD_LOCAL', 'FL_URGENCIA', 'FL_ELETIVA'
+        ])
+        main_layout.addWidget(self.table)
+
+        # Separador
+        separator2 = QFrame()
+        separator2.setFrameShape(QFrame.HLine)
+        separator2.setFrameShadow(QFrame.Sunken)
+        main_layout.addWidget(separator2)
+
+        # Botão para armazenar a informação (centralizado)
+        btn_store_layout = QHBoxLayout()
+        btn_store = QPushButton("Armazenar Informação")
+        btn_store.setFixedSize(200, 40)
+        btn_store.clicked.connect(self.store_information)  # Conecta à função de armazenamento
+        btn_store_layout.addStretch()  # Adiciona espaço antes do botão
+        btn_store_layout.addWidget(btn_store)
+        btn_store_layout.addStretch()  # Adiciona espaço depois do botão
+        main_layout.addLayout(btn_store_layout)
+
+        # Adiciona o layout principal a um widget para o QScrollArea
+        container_widget = QWidget()
+        container_widget.setLayout(main_layout)
+
+        # Cria uma área de rolagem
+        scroll_area = QScrollArea()
+        scroll_area.setWidgetResizable(True)
+        scroll_area.setWidget(container_widget)
+
+        # Define o layout da janela
+        window_layout = QVBoxLayout()
+        window_layout.addWidget(scroll_area)
+        self.setLayout(window_layout)
+
+    def perform_search(self):
+        # Obtém o termo de pesquisa e o caminho do driver JDBC
+        search_term = self.search_input.text()
+        path_drive = r'./ARQUIVOS/Oracle_Jdbc/ojdbc8.jar'
+
+        if search_term:
+            try:
+                # Instancia a classe JdbcPermission
+                jdbc_permission = JdbcPermission(path_drive)
+
+                # Usa o método fetch_data para buscar os dados
+                self.df_search, protocol = jdbc_permission.fetch_data(search_term, chunk_size=50000, progress_bar=self.progress_bar_process_search)
+
+                # Atualiza o self.df_search com os dados encontrados
+                #self.df_search = df
+
+                # Define o número de linhas e colunas da tabela com base no DataFrame
+                self.table.setRowCount(len(self.df_search))
+                self.table.setColumnCount(len(self.df_search.columns))
+                self.table.setHorizontalHeaderLabels(self.df_search.columns)
+
+                # Preenche a tabela com os dados do DataFrame
+                for row_idx, row_data in self.df_search.iterrows():
+                    for col_idx, cell_data in enumerate(row_data):
+                        self.table.setItem(row_idx, col_idx, QTableWidgetItem(str(cell_data)))
+
+                if self.df_search.empty:
+                    QMessageBox.warning(self, 'Aviso', f'Protocolo(s): ( {protocol} ) inelegível para automatização de documentos. \n\nSolicita-se verificação com a coordenação.')
+
+            except Exception as erro:
+                QMessageBox.critical(self, "Erro", f"Erro ao buscar dados:\n{str(erro)}")
+        else:
+            QMessageBox.warning(self, "Aviso", "Digite um termo para pesquisar!")
+
+    def store_information(self):
+        # Verifica se há dados no DataFrame
+        if self.df_search.empty:
+            QMessageBox.warning(self, "Aviso", "Nenhuma informação foi encontrada para armazenar!")
+            return None
+
+        # Exibe uma mensagem de sucesso e retorna o DataFrame
+        QMessageBox.information(self, "Informação", "Informação armazenada com sucesso!")
+        return self.df_search
