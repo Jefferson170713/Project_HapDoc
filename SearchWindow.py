@@ -11,6 +11,7 @@ from PyQt5.QtWidgets import QTableWidget
 from PyQt5.QtWidgets import QTableWidgetItem
 from PyQt5.QtWidgets import QScrollArea
 from PyQt5.QtWidgets import QWidget
+from PyQt5.QtWidgets import QProgressBar
 
 #from ARQUIVOS.Oracle_Jdbc.jdbc_permission import JdbcPermission 
 from ARQUIVOS.Oracle_Jdbc.jdbc_teste_02 import JdbcPermission 
@@ -23,6 +24,7 @@ class SearchWindow(QDialog):
         self.init_ui()
         self.df_search = pd.DataFrame()  # DataFrame para armazenar os dados pesquisados
         self.parent = parent  # Armazena a referência ao widget pai
+        self.progress_bar_process_search = None
 
     def init_ui(self):
         # Cria o layout principal
@@ -39,6 +41,14 @@ class SearchWindow(QDialog):
         btn_search.clicked.connect(self.perform_search)  # Conecta à função de pesquisa
         search_layout.addWidget(btn_search)
 
+        # Barra de progresso (agora como atributo da classe)
+        self.progress_bar_process_search = QProgressBar()
+        self.progress_bar_process_search.setValue(0)
+        self.progress_bar_process_search.setMinimum(0)
+        self.progress_bar_process_search.setMaximum(100)
+        main_layout.addWidget(self.progress_bar_process_search)
+
+
         main_layout.addLayout(search_layout)
 
         # Separador
@@ -49,15 +59,13 @@ class SearchWindow(QDialog):
 
         # Tabela para exibir os resultados
         self.table = QTableWidget()
-        self.table.setColumnCount(14)  # Define 14 colunas
+        self.table.setColumnCount(15)  # Define 15 colunas
         self.table.setHorizontalHeaderLabels([
-            'CD_PROTOCOLO', 'DT_STATUS', 'CD_ANO', 'CD_SERV_HONORARIO',
-            'CD_PROCEDIMENTO_TUSS', 'NM_PROCEDIMENTO', 'NM_PROCEDIMENTO_TUSS',
-            'CD_TIPO_REDE_ATENDIMENTO', 'VL_PROPOSTO', 'VL_DEFLATOR',
-            'VL_DEFLATOR_UCO', 'VL_FILME_PROPOSTO', 'CD_LOCAL', 'FL_URGENCIA',
-            'FL_ELETIVA'
+            'CD_PROTOCOLO', 'CD_SERV_HONORARIO', 'CD_PROCEDIMENTO_TUSS', 'CD_ANO',
+            'DT_STATUS', 'NM_PROCEDIMENTO', 'NM_PROCEDIMENTO_TUSS', 'REDE',
+            'VL_PROPOSTO', 'VL_DEFLATOR', 'VL_DEFLATOR_UCO', 'VL_FILME_PROPOSTO',
+            'CD_LOCAL', 'FL_URGENCIA', 'FL_ELETIVA'
         ])
-        #self.table.setRowCount()  # Exibe inicialmente 5 linhas
         main_layout.addWidget(self.table)
 
         # Separador
@@ -101,20 +109,11 @@ class SearchWindow(QDialog):
                 jdbc_permission = JdbcPermission(path_drive)
 
                 # Usa o método fetch_data para buscar os dados
-                df, protocol = jdbc_permission.fetch_data(search_term)
-
-                cd_protocol = df.CD_PROTOCOLO.unique().tolist()
-
-                protocol = protocol.split(', ')
-
-                protocol = [int(p) for p in protocol]  # Converte os protocolos para inteiros
-
-                protocol_diff = list(set(protocol) - set(cd_protocol))
-
-                print(protocol, cd_protocol, protocol_diff)
+                df, protocol = jdbc_permission.fetch_data(search_term, chunk_size=50000, progress_bar=self.progress_bar_process_search)
 
                 # Atualiza o self.df_search com os dados encontrados
                 self.df_search = df
+
                 # Define o número de linhas e colunas da tabela com base no DataFrame
                 self.table.setRowCount(len(df))
                 self.table.setColumnCount(len(df.columns))
@@ -127,11 +126,6 @@ class SearchWindow(QDialog):
 
                 if self.df_search.empty:
                     QMessageBox.warning(self, 'Aviso', f'Protocolo(s): ( {protocol} ) inelegível para automatização de documentos. \n\nSolicita-se verificação com a coordenação.')
-
-                if len(protocol) != len(cd_protocol):
-                    protocol_diff = ', '.join([str(p) for p in protocol_diff])
-                    QMessageBox.warning(self, 'Aviso', f'Protocolo(s): ( {protocol_diff} ) inelegível para automatização de documentos. \n\nSolicita-se verificação com a coordenação.')
-
 
             except Exception as erro:
                 QMessageBox.critical(self, "Erro", f"Erro ao buscar dados:\n{str(erro)}")
