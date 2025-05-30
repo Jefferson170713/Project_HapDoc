@@ -8,7 +8,7 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QWidget
 from WindowProcedurePackage import WindowProcedurePackage
 from WindowCenterClinic import WindowCenterClinic
-from ServicesWindow import ServicesWindow
+from ServiceWindow import ServicesWindow
 
 
 # Classe principal da aplicação
