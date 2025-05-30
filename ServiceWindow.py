@@ -36,8 +36,8 @@ class ServicesWindow:
         status_layout = QHBoxLayout()
 
         # QLabel para exibir o status do arquivo
-        self.label_status = QLabel("Nenhum arquivo carregado.")
-        status_layout.addWidget(self.label_status)
+        self.label_status_win_one = QLabel("Nenhum arquivo carregado.")
+        status_layout.addWidget(self.label_status_win_one)
 
         # Adiciona um espaço expansível para empurrar o botão para a direita
         status_layout.addStretch()
@@ -98,72 +98,105 @@ class ServicesWindow:
         # Cria uma instância da janela de pesquisa
         search_window = SearchWindow(self.parent)
         search_window.exec_()  # Exibe a janela de forma modal
+        self.df_search = search_window.df_search
     
     # Função para processar e salvar o arquivo
     def process_and_save(self):
-        print(self.df.head(2))
-        if not self.file_path:
-            QMessageBox.warning(self.parent, "Aviso", "Nenhum arquivo foi carregado!")
+
+        if self.df_search.empty:
+            QMessageBox.warning(self.parent, "Aviso", "Nenhum dado carregado para salvar!")
             return
 
-        # Selecionar o local para salvar o arquivo processado
-        save_path, _ = QFileDialog.getSaveFileName(self.parent, "Salvar Arquivo", "", "Arquivos Excel (*.xlsx)")
+        # Abre o diálogo para escolher o local e nome do arquivo
+        save_path, _ = QFileDialog.getSaveFileName(
+            self.parent,
+            "Salvar Arquivo",
+            "",
+            "Arquivos Excel (*.xlsx);;Arquivos CSV (*.csv);;Todos os arquivos (*)"
+        )
         if not save_path:
-            return
+            return  # Usuário cancelou
 
         try:
-            # Adiciona a extensão .xlsx se não estiver presente
-            if not save_path.endswith(".xlsx"):
-                save_path += ".xlsx"
+            # Salva como Excel se terminar com .xlsx, senão salva como CSV
+            if save_path.endswith(".xlsx"):
+                # restante do processos aqui.
+                self.df_search = self.adjust_values()  # Ajusta os valores antes de salvar
+                self.progress_bar_process.setValue(20)  # Reseta a barra de progresso
+                self.df_search = self.creating_the_master_key()  # Cria a chave mestre
+                self.progress_bar_process.setValue(45)
+                self.df_search = self.grouping_the_networks()  # Agrupa as redes
+                self.progress_bar_process.setValue(75)
+                self.df_search = self.breaking_the_primary_key_into_columns()  # Quebra a chave primária em colunas
+                self.progress_bar_process.setValue(95)
+                sheet_name = f'GERAL {self.df_search.CD_PROTOCOLO.iloc[0]}'
+                self.df_search.to_excel(save_path, index=False, engine='openpyxl', sheet_name=sheet_name)
+                self.progress_bar_process.setValue(100)  # Completa a barra de progresso
+                self.label_status_win_one.setText(f"{self.df_search.shape[0]} linhas carregadas e salvas no arquivo Excel.")
 
-            # Adiciona a data e hora ao nome do arquivo
-            date = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")  # Formato: AAAA-MM-DD_HH-MM-SS
-            base_name, ext = os.path.splitext(save_path)  # Divide o caminho em nome base e extensão
-            save_path = f"{base_name}_{date}{ext}"  # Adiciona a data ao nome do arquivo
-
-            # Processar o arquivo
-            self.output_path = save_path
-
-            # Verifica se o DataFrame self.df está carregado
-            if self.df.empty:
-                QMessageBox.warning(self.parent, "Aviso", "Os dados não foram carregados corretamente!")
-                return
-
-            # Renomeia as colunas antes de salvar
-            self.df.rename(
-                columns={
-                    'CD_SERVIÇO_HONORARIO': 'CÓDIGO AUTORIZAÇÃO',
-                    'VALOR_PROPOSTO': 'VALOR',
-                    'CD_PROCEDIMENTO_TUSS': 'CÓDIGO TUSS',
-                },
-                inplace=True
-            )
-
-            # # Criando o arquivo Excel com a aba principal
-            # with ExcelWriter(save_path, engine='openpyxl') as writer:
-            #     # Salvando a aba principal
-            #     self.df.to_excel(writer, index=False, sheet_name='GERAL')
-
-            #     # Salvando as abas adicionais
-            #     for num, save in enumerate(self.df['URG_ELE_TAX_MAT_MED_CH_ANE_AUX'].unique()):
-            #         # Filtrando os dados
-            #         filtered_df = self.df[self.df['URG_ELE_TAX_MAT_MED_CH_ANE_AUX'] == save].copy()
-            #         sheet_name = f'NEG. {num + 1}'
-
-            #         # Salvando no mesmo arquivo Excel com o nome da aba correspondente
-            #         filtered_df.to_excel(writer, index=False, sheet_name=sheet_name)
-            print(f"Arquivo processado e salvo em: {save_path}")
-
-            QMessageBox.information(self.parent, "Sucesso", f"Arquivo processado e salvo em:\n{save_path}")
-
+            else:
+                self.df_search.to_csv(save_path, index=False, sep=';', encoding='latin1', low_memory=False)
+            QMessageBox.information(self.parent, "Sucesso", f"Arquivo salvo em:\n{save_path}")
         except Exception as e:
-            # Mensagem de erro detalhada
-            QMessageBox.critical(self.parent, "Erro", f"Ocorreu um erro ao processar o arquivo:\n{str(e)}")
+            QMessageBox.critical(self.parent, "Erro", f"Ocorreu um erro ao salvar o arquivo:\n{str(e)}")
     
     # Função para limpar o status
     def clear_status(self):
-        self.label_status.setText("Nenhum arquivo carregado.")
-        self.text_edit_info.clear()
+        self.progress_bar_process.setValue(0)
+        self.label_status_win_one.setText("Nenhum arquivo carregado.")
+    
+    def adjust_values(self):
+        self.df_search['CD_PROCEDIMENTO_TUSS'] = self.df_search['CD_PROCEDIMENTO_TUSS'].fillna(0)
+        self.df_search['CD_SERV_HONORARIO'] = self.df_search['CD_SERV_HONORARIO'].fillna(0)
+        self.df_search['VL_FILME_PROPOSTO'] = self.df_search['VL_FILME_PROPOSTO'].fillna(0)
+        self.df_search['NM_PROCEDIMENTO_TUSS'] = self.df_search['NM_PROCEDIMENTO_TUSS'].fillna('-')
+        self.df_search['CD_PROCEDIMENTO_TUSS'] = self.df_search['CD_PROCEDIMENTO_TUSS'].astype(int)
+        self.df_search['CD_SERV_HONORARIO'] = self.df_search['CD_SERV_HONORARIO'].astype(str)#
+
+        self.df_search['VL_PROPOSTO'] = self.df_search['VL_PROPOSTO'].astype(float).map(lambda x: '{:.5f}'.format(x).replace('.', ','))
+        self.df_search['VL_DEFLATOR'] = self.df_search['VL_DEFLATOR'].astype(float).map(lambda x: '{:.5f}'.format(x).replace('.', ','))
+        self.df_search['VL_DEFLATOR_UCO'] = self.df_search['VL_DEFLATOR_UCO'].astype(float).map(lambda x: '{:.5f}'.format(x).replace('.', ','))
+        self.df_search['VL_FILME_PROPOSTO'] = self.df_search['VL_FILME_PROPOSTO'].astype(float).map(lambda x: '{:.5f}'.format(x).replace('.', ','))
+
+        return self.df_search
+    
+    def creating_the_master_key(self):
+        
+        self.df_search['KEY_SHARE_REDE'] = self.df_search.CD_PROTOCOLO.astype(str) + '_' + self.df_search.CD_SERV_HONORARIO.astype(str) + '_' + self.df_search.CD_PROCEDIMENTO_TUSS.astype(str) + '_' + self.df_search.CD_ANO.astype(str) + '_' + self.df_search.DT_STATUS + '_' + self.df_search.NM_PROCEDIMENTO.astype(str) + '_' + self.df_search.NM_PROCEDIMENTO_TUSS.astype(str) + '_' + self.df_search.VL_PROPOSTO.astype(str) + '_' + self.df_search.VL_DEFLATOR.astype(str) + '_' + self.df_search.VL_DEFLATOR_UCO.astype(str) + '_' + self.df_search.VL_FILME_PROPOSTO.astype(str) + '_' + self.df_search.CD_LOCAL.astype(str) + '_' + self.df_search.FL_URGENCIA.astype(str) + '_' + self.df_search.FL_ELETIVA.astype(str)
+        
+        self.df_search = self.df_search[['KEY_SHARE_REDE','REDE']].copy()
+
+        self.df_search.rename(columns={'CD_TIPO_REDE_ATENDIMENTO' : 'REDE'}, inplace=True)
+        self.df_search = self.df_search.sort_values(by=['REDE'])
+        self.df_search.reset_index(drop=True, inplace=True)
+        
+        return self.df_search
+    
+    def grouping_the_networks(self):
+        self.df_search = (
+            self.df_search
+            .groupby('KEY_SHARE_REDE')
+            .agg(
+                REDE=('REDE', lambda x: ', '.join(sorted(set(x)))),
+                QTD_REDE=('REDE', 'nunique')
+            )
+            .reset_index()
+        )
+        self.df_search = self.df_search.sort_values(by=['REDE', 'QTD_REDE'], ascending=True)
+        self.df_search.reset_index(drop=True, inplace=True)
+
+        return self.df_search
+    
+    def breaking_the_primary_key_into_columns(self):
+
+        self.df_search[['CD_PROTOCOLO', 'CD_SERV_HONORARIO', 'CD_PROCEDIMENTO_TUSS', 'CD_ANO','DT_STATUS','NM_PROCEDIMENTO', 'NM_PROCEDIMENTO_TUSS', 'VL_PROPOSTO', 'VL_DEFLATOR', 'VL_DEFLATOR_UCO', 'VL_FILME_PROPOSTO', 'CD_LOCAL', 'FL_URGENCIA', 'FL_ELETIVA']] = self.df_search['KEY_SHARE_REDE'].str.split('_', expand=True)
+        self.df_search.drop(columns=['KEY_SHARE_REDE'], inplace=True)
+        self.df_search = self.df_search[['CD_PROTOCOLO', 'CD_SERV_HONORARIO', 'CD_PROCEDIMENTO_TUSS', 'CD_ANO', 'DT_STATUS','NM_PROCEDIMENTO', 'NM_PROCEDIMENTO_TUSS', 'VL_PROPOSTO', 'VL_DEFLATOR', 'VL_DEFLATOR_UCO', 'VL_FILME_PROPOSTO', 'CD_LOCAL', 'FL_URGENCIA', 'FL_ELETIVA', 'QTD_REDE','REDE']]
+        
+        return self.df_search
+    
+
+
 
 class SearchWindow(QDialog):
     def __init__(self, parent=None):
@@ -196,6 +229,9 @@ class SearchWindow(QDialog):
         self.progress_bar_process_search.setMinimum(0)
         self.progress_bar_process_search.setMaximum(100)
         main_layout.addWidget(self.progress_bar_process_search)
+
+        self.label_status = QLabel("Status: Nenhuma pesquisa realizada.")
+        main_layout.addWidget(self.label_status)
 
 
         main_layout.addLayout(search_layout)
@@ -260,6 +296,7 @@ class SearchWindow(QDialog):
                 # Usa o método fetch_data para buscar os dados
                 self.df_search, protocol = jdbc_permission.fetch_data(search_term, chunk_size=50000, progress_bar=self.progress_bar_process_search)
 
+                self.label_status.setText(f"{len(self.df_search)} linhas carregadas.")
                 # Atualiza o self.df_search com os dados encontrados
                 #self.df_search = df
 
