@@ -130,6 +130,7 @@ class ServicesWindow:
                 self.df_search = self.breaking_the_primary_key_into_columns()  # Quebra a chave primária em colunas
                 self.progress_bar_process.setValue(95)
                 sheet_name = f'GERAL {self.df_search.CD_PROTOCOLO.iloc[0]}'
+                self.df_search = self.rename_columns()  # Renomeia as colunas
                 self.df_search.to_excel(save_path, index=False, engine='openpyxl', sheet_name=sheet_name)
                 self.progress_bar_process.setValue(100)  # Completa a barra de progresso
                 self.label_status_win_one.setText(f"{self.df_search.shape[0]} linhas carregadas e salvas no arquivo Excel.")
@@ -194,6 +195,29 @@ class ServicesWindow:
         self.df_search = self.df_search[['CD_PROTOCOLO', 'CD_SERV_HONORARIO', 'CD_PROCEDIMENTO_TUSS', 'CD_ANO', 'DT_STATUS','NM_PROCEDIMENTO', 'NM_PROCEDIMENTO_TUSS', 'VL_PROPOSTO', 'VL_DEFLATOR', 'VL_DEFLATOR_UCO', 'VL_FILME_PROPOSTO', 'CD_LOCAL', 'FL_URGENCIA', 'FL_ELETIVA', 'QTD_REDE','REDE']]
         
         return self.df_search
+    
+    def rename_columns(self):
+        self.df_search.rename(
+            columns={
+            'CD_PROTOCOLO': 'PROTOCOLO',
+            'CD_SERV_HONORARIO': 'CÓDIGO NEGOCIAÇÃO',
+            'CD_PROCEDIMENTO_TUSS': 'CÓDIGO TUSS',
+            'CD_ANO': 'TABELA',
+            'DT_STATUS': 'DT_STATUS',
+            'NM_PROCEDIMENTO': 'DESCRIÇÃO',
+            'NM_PROCEDIMENTO_TUSS': 'DESCRIÇÃO TUSS',
+            'VL_PROPOSTO': 'CH',
+            'VL_DEFLATOR': 'PORTE',
+            'VL_DEFLATOR_UCO': 'UCO',
+            'VL_FILME_PROPOSTO': 'FILME',
+            'CD_LOCAL': 'LOCAL',
+            'FL_URGENCIA': 'URGÊNCIA',
+            'FL_ELETIVA': 'ELETIVO'
+        }, 
+        inplace=True)
+
+        return self.df_search
+    
     
 
 
