@@ -420,11 +420,11 @@ class SearchWindow(QDialog):
                         self.table.setItem(row_idx, col_idx, QTableWidgetItem(str(cell_data)))
 
                 if self.df_search.empty:
-                    QMessageBox.warning(self, 'Aviso', f'Protocolo(s): ( {protocol} ) inelegível para automatização de documentos. \n\nSolicita-se verificação com a coordenação.')
+                    QMessageBox.warning(self, 'Aviso', f' 1 - Protocolo(s): ( {protocol} ) inelegível para automatização de documentos. \n\nSolicita-se verificação com a coordenação.')
 
                 if len(protocol) != len(cd_protocol):
                     protocol_diff = ', '.join([str(p) for p in protocol_diff])
-                    QMessageBox.warning(self, 'Aviso', f'Protocolo(s): ( {protocol_diff} ) inelegível para automatização de documentos. \n\nSolicita-se verificação com a coordenação.')
+                    QMessageBox.warning(self, 'Aviso', f'2 - Protocolo(s): ( {protocol_diff} ) inelegível para automatização de documentos. \n\nSolicita-se verificação com a coordenação.')
 
 
             except Exception as erro:

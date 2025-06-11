@@ -1,4 +1,6 @@
 import pandas as pd
+import warnings
+warnings.simplefilter(action='ignore', category=FutureWarning)
 from PyQt5.QtWidgets import QVBoxLayout
 from PyQt5.QtWidgets import QLabel
 from PyQt5.QtWidgets import QPushButton
@@ -7,8 +9,6 @@ from PyQt5.QtWidgets import QFileDialog
 from PyQt5.QtWidgets import QMessageBox
 from PyQt5.QtWidgets import QHBoxLayout
 from PyQt5.QtWidgets import QProgressBar
-from PyQt5.QtWidgets import QCheckBox
-from PyQt5.QtWidgets import QButtonGroup
 from PyQt5.QtWidgets import QLineEdit
 from PyQt5.QtWidgets import QDialog
 from PyQt5.QtWidgets import QTableWidget
@@ -16,10 +16,9 @@ from PyQt5.QtWidgets import QTableWidgetItem
 from PyQt5.QtWidgets import QScrollArea
 from PyQt5.QtWidgets import QWidget
 from PyQt5.QtWidgets import QTextEdit
-from datetime import datetime
 import os
 #from SearchWindow import SearchWindow
-from ARQUIVOS.Oracle_Jdbc.jdbc_teste_02 import JdbcPermission 
+from ARQUIVOS.Oracle_Jdbc.jdbc_servicos import JdbcPermission 
 
 class ServicesWindow:
     def __init__(self, parent=None):
@@ -28,6 +27,7 @@ class ServicesWindow:
         self.output_path = None
         self.df = pd.DataFrame()
         self.progress_bar_process = None
+        self.df_search = pd.DataFrame()  # DataFrame para armazenar os dados pesquisados
 
     def create_window_services(self, service_process):
         service = QVBoxLayout()
@@ -102,44 +102,40 @@ class ServicesWindow:
     
     # Função para processar e salvar o arquivo
     def process_and_save(self):
-
         if self.df_search.empty:
             QMessageBox.warning(self.parent, "Aviso", "Nenhum dado carregado para salvar!")
             return
 
-        # Abre o diálogo para escolher o local e nome do arquivo
-        save_path, _ = QFileDialog.getSaveFileName(
+        # Pede apenas o diretório onde salvar
+        folder = QFileDialog.getExistingDirectory(
             self.parent,
-            "Salvar Arquivo",
-            "",
-            "Arquivos Excel (*.xlsx);;Arquivos CSV (*.csv);;Todos os arquivos (*)"
+            "Selecione a pasta para salvar o arquivo"
         )
-        if not save_path:
+        if not folder:
             return  # Usuário cancelou
 
-        try:
-            # Salva como Excel se terminar com .xlsx, senão salva como CSV
-            if save_path.endswith(".xlsx"):
-                # restante do processos aqui.
-                self.df_search = self.adjust_values()  # Ajusta os valores antes de salvar
-                self.progress_bar_process.setValue(20)  # Reseta a barra de progresso
-                self.df_search = self.creating_the_master_key()  # Cria a chave mestre
-                self.progress_bar_process.setValue(45)
-                self.df_search = self.grouping_the_networks()  # Agrupa as redes
-                self.progress_bar_process.setValue(75)
-                self.df_search = self.breaking_the_primary_key_into_columns()  # Quebra a chave primária em colunas
-                self.progress_bar_process.setValue(95)
-                sheet_name = f'GERAL {self.df_search.CD_PROTOCOLO.iloc[0]}'
-                self.df_search = self.rename_columns()  # Renomeia as colunas
-                self.df_search.to_excel(save_path, index=False, engine='openpyxl', sheet_name=sheet_name)
-                self.progress_bar_process.setValue(100)  # Completa a barra de progresso
-                self.label_status_win_one.setText(f"{self.df_search.shape[0]} linhas carregadas e salvas no arquivo Excel.")
+        # Gera o nome do arquivo automaticamente
+        protocolo = str(self.df_search['CD_PROTOCOLO'].iloc[0])
+        file_name = f"PROTOCOLO_{protocolo}.xlsx"
+        save_path = os.path.join(folder, file_name)
 
-            else:
-                self.df_search.to_csv(save_path, index=False, sep=';', encoding='latin1', low_memory=False)
-            QMessageBox.information(self.parent, "Sucesso", f"Arquivo salvo em:\n{save_path}")
-        except Exception as e:
-            QMessageBox.critical(self.parent, "Erro", f"Ocorreu um erro ao salvar o arquivo:\n{str(e)}")
+        try:
+            self.df_search = self.adjust_values()
+            self.progress_bar_process.setValue(20)
+            self.df_search = self.creating_the_master_key()
+            self.progress_bar_process.setValue(45)
+            self.df_search = self.grouping_the_networks()
+            self.progress_bar_process.setValue(75)
+            self.df_search = self.breaking_the_primary_key_into_columns()
+            self.progress_bar_process.setValue(95)
+
+            self.save_to_excel(self.df_search, save_path)
+
+            self.progress_bar_process.setValue(100)
+            self.label_status_win_one.setText(f"{self.df_search.shape[0]} linhas carregadas e salvas no arquivo Excel.")
+            #QMessageBox.information(self.parent, "Sucesso", f"Arquivo salvo em:\n{save_path}")
+        except Exception as erro:
+            QMessageBox.critical(self.parent, "Erro", f"Ocorreu um erro ao salvar o arquivo:\n{str(erro)}")
     
     # Função para limpar o status
     def clear_status(self):
@@ -147,17 +143,20 @@ class ServicesWindow:
         self.label_status_win_one.setText("Nenhum arquivo carregado.")
     
     def adjust_values(self):
-        self.df_search['CD_PROCEDIMENTO_TUSS'] = self.df_search['CD_PROCEDIMENTO_TUSS'].fillna(0)
-        self.df_search['CD_SERV_HONORARIO'] = self.df_search['CD_SERV_HONORARIO'].fillna(0)
-        self.df_search['VL_FILME_PROPOSTO'] = self.df_search['VL_FILME_PROPOSTO'].fillna(0)
-        self.df_search['NM_PROCEDIMENTO_TUSS'] = self.df_search['NM_PROCEDIMENTO_TUSS'].fillna('-')
-        self.df_search['CD_PROCEDIMENTO_TUSS'] = self.df_search['CD_PROCEDIMENTO_TUSS'].astype(int)
-        self.df_search['CD_SERV_HONORARIO'] = self.df_search['CD_SERV_HONORARIO'].astype(str)#
+        df_search = self.df_search.copy()
+        df_search['CD_PROCEDIMENTO_TUSS'] = df_search['CD_PROCEDIMENTO_TUSS'].fillna(0).astype(str)
+        df_search['CD_SERV_HONORARIO'] = df_search['CD_SERV_HONORARIO'].fillna(0)
+        df_search['VL_FILME_PROPOSTO'] = df_search['VL_FILME_PROPOSTO'].fillna(0).astype(float)
+        df_search['NM_PROCEDIMENTO_TUSS'] = df_search['NM_PROCEDIMENTO_TUSS'].fillna('-')
+        df_search['CD_PROCEDIMENTO_TUSS'] = df_search['CD_PROCEDIMENTO_TUSS'].astype(int)
+        df_search['CD_SERV_HONORARIO'] = df_search['CD_SERV_HONORARIO'].astype(str)#
 
-        self.df_search['VL_PROPOSTO'] = self.df_search['VL_PROPOSTO'].astype(float).map(lambda x: '{:.5f}'.format(x).replace('.', ','))
-        self.df_search['VL_DEFLATOR'] = self.df_search['VL_DEFLATOR'].astype(float).map(lambda x: '{:.5f}'.format(x).replace('.', ','))
-        self.df_search['VL_DEFLATOR_UCO'] = self.df_search['VL_DEFLATOR_UCO'].astype(float).map(lambda x: '{:.5f}'.format(x).replace('.', ','))
-        self.df_search['VL_FILME_PROPOSTO'] = self.df_search['VL_FILME_PROPOSTO'].astype(float).map(lambda x: '{:.5f}'.format(x).replace('.', ','))
+        df_search['VL_PROPOSTO'] = df_search['VL_PROPOSTO'].astype(float).map(lambda x: '{:.5f}'.format(x).replace('.', ','))
+        df_search['VL_DEFLATOR'] = df_search['VL_DEFLATOR'].astype(float).map(lambda x: '{:.5f}'.format(x).replace('.', ','))
+        df_search['VL_DEFLATOR_UCO'] = df_search['VL_DEFLATOR_UCO'].astype(float).map(lambda x: '{:.5f}'.format(x).replace('.', ','))
+        df_search['VL_FILME_PROPOSTO'] = df_search['VL_FILME_PROPOSTO'].astype(float).map(lambda x: '{:.5f}'.format(x).replace('.', ','))
+
+        self.df_search = df_search.copy()
 
         return self.df_search
     
@@ -218,7 +217,66 @@ class ServicesWindow:
 
         return self.df_search
     
-    
+    def save_to_excel(self, df, file_path):
+
+        try:
+            df_tabelas = pd.read_csv(r'./ARQUIVOS/de_para_sigo.csv', sep=';', encoding='latin1', low_memory=False)
+            print(f'Quantidade de linhas e colunas df_tabelas: {df_tabelas.shape}')
+
+            df_tabelas['ANO_TABELA'] = df_tabelas['ANO_TABELA'].astype(str)
+            df_tabelas.rename(columns={'ANO_TABELA': 'TABELA', 'DESCRICAO':'DESCRIÇÃO TABELA'}, inplace=True)
+
+            df_copy = df.copy()  # Cria uma cópia do DataFrame para evitar problemas de escrita 
+            sheet_name = f'GERAL {df_copy.CD_PROTOCOLO.iloc[0]}'
+            df_copy = self.rename_columns()  # Renomeia as colunas
+
+            map_dict = dict(zip(df_tabelas['TABELA'], df_tabelas['DESCRIÇÃO TABELA']))
+            df_copy['DESCRIÇÃO TABELA'] = df_copy['TABELA'].map(map_dict).fillna('-')
+            
+            order_columns = ['PROTOCOLO', 'TABELA', 'DESCRIÇÃO TABELA', 'CÓDIGO NEGOCIAÇÃO', 'CÓDIGO TUSS',
+                'DESCRIÇÃO', 'DESCRIÇÃO TUSS', 'CH', 'PORTE', 'UCO', 'FILME', 'LOCAL',
+                'URGÊNCIA', 'ELETIVO', 'QTD_REDE', 'REDE']
+            df_copy = df_copy[order_columns].copy()  # Reordena as colunas
+            print(f'df_copy: {df_copy.columns}')
+            print(f'Teste 0')
+            df_copy.to_excel(file_path, index=False, engine='openpyxl', sheet_name=sheet_name)
+            self.label_status_win_one.setText(f"{df.shape[0]} linhas carregadas e salvas no arquivo Excel.")
+            
+            #print(f'Teste 1')
+            df_copy['CÓDIGO TUSS'] = df_copy['CÓDIGO TUSS'].astype(str).replace('0', '-')
+            df_copy['DESCRIÇÃO TUSS'] = df_copy['DESCRIÇÃO TUSS'].astype(str).replace('0', '-')
+            df_copy['LOCAL'] = df_copy['LOCAL'].fillna('-')
+            df_copy['DESCRIÇÃO TUSS'] = df_copy['DESCRIÇÃO TUSS'].astype(str).replace('0', '-')
+            df_copy['LOCAL'] = df_copy['LOCAL'].fillna('-')
+            df_copy['DESCRIÇÃO TUSS'] = df_copy['DESCRIÇÃO TUSS'].astype(str).replace('.0', '')
+            #print(f'Teste 2')
+            # criando a chave para separar os arquivos para salvar
+            df_copy['KEY_BREAK'] = df_copy['CH'].astype(str) + '_' + df_copy['PORTE'].astype(str) + '_' + df_copy['UCO'].astype(str) + '_' + df_copy['FILME'].astype(str) + '_' + df_copy['LOCAL'].astype(str) + '_' + df_copy['URGÊNCIA'].astype(str) + '_' + df_copy['ELETIVO'].astype(str)
+            #print(f'Teste 3')
+            print(df_copy.columns)
+            order_columns_02 = ['PROTOCOLO', 'TABELA', 'DESCRIÇÃO TABELA', 'CÓDIGO NEGOCIAÇÃO', 'CÓDIGO TUSS',
+                'DESCRIÇÃO', 'DESCRIÇÃO TUSS', 'CH', 'PORTE', 'UCO', 'FILME', 'LOCAL',
+                'URGÊNCIA', 'ELETIVO', 'QTD_REDE', 'REDE', 'KEY_BREAK']
+            
+            df_copy = df_copy[order_columns_02].copy()  # Reordena as colunas novamente
+            # salvando no mesmo arquivo Excel, mas em abas diferentes por valor unique da chave
+            unique_keys = df_copy['KEY_BREAK'].unique()
+            neg = f'NEG. '
+            with pd.ExcelWriter(file_path, engine='openpyxl', mode='a') as writer:
+                for num, key in enumerate(unique_keys):
+                    df_key = df_copy[df_copy['KEY_BREAK'] == key].copy()
+                    df_key.drop(columns=['KEY_BREAK'], inplace=True)  # Remove a coluna de chave
+                    df_key.reset_index(drop=True, inplace=True)  # Reseta o índice
+                    name_sheet_aba = f'{neg}{num + 1}'
+                    df_key.to_excel(writer, index=False, sheet_name=name_sheet_aba)
+
+            self.file_path = file_path  # Armazena o caminho do arquivo
+            self.output_path = os.path.dirname(file_path)  # Armazena o diretório do arquivo
+
+            #self.text_edit_info.setText(f"Arquivo salvo com sucesso em:\n{file_path}\n\nTotal de linhas: {df.shape[0]}")
+            QMessageBox.information(self.parent, "Sucesso", f"Arquivo salvo em:\n{file_path}")
+        except Exception as e:
+            QMessageBox.critical(self.parent, "Erro", f"Ocorreu um erro ao salvar o arquivo:\n{str(e)}")
 
 
 
