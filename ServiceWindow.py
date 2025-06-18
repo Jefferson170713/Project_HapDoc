@@ -396,7 +396,8 @@ class SearchWindow(QDialog):
                     QMessageBox.warning(self, 'Aviso', f'Protocolo(s): ( {protocol} ) inelegível para automatização de documentos. \n\nSolicita-se verificação com a coordenação.')
 
             except Exception as erro:
-                QMessageBox.critical(self, "Erro", f"Erro ao buscar dados:\n{str(erro)}")
+                QMessageBox.warning(self, 'Aviso', f'Protocolo(s): ( {search_term} ) inelegível para automatização de documentos. \n\nSolicita-se verificação com a coordenação.')
+                #QMessageBox.critical(self, "Erro", f"Erro ao buscar dados:\n{str(erro)}")
         else:
             QMessageBox.warning(self, "Aviso", "Digite um termo para pesquisar!")
 

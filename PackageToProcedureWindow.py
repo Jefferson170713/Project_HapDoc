@@ -26,8 +26,8 @@ class PackageToProcedureWindow:
         self.file_path = None
         self.output_path = None
         self.df = pd.DataFrame()
-        self.progress_bar_process = None
         self.df_search = pd.DataFrame()  # DataFrame para armazenar os dados pesquisados
+        self.progress_bar_process = None
 
     def create_window_packagetoprocedure(self, service_process):
         service = QVBoxLayout()
@@ -102,19 +102,152 @@ class PackageToProcedureWindow:
     
     # Função para processar e salvar o arquivo
     def process_and_save(self):
-        ...
+        folder = QFileDialog.getExistingDirectory(self.parent, "Selecione a pasta de destino")
+        if folder:
+            if not self.df_search.empty:
+                # Define o caminho do arquivo de saída
+                #self.output_path = os.path.join(folder, "dados_procedimentos.xlsx")
+                protocolo =  self.df_search['CD_PROTOCOLO'].iloc[0]
+                print(f"Protocolo pesquisado: {protocolo}")
+                ...
+                try:
+                    # Salva o DataFrame em um arquivo Excel
+                    # self.save_to_excel(self.df_search, self.output_path)
+                    # QMessageBox.information(self.parent, "Sucesso", f"Dados salvos em: {self.output_path}")
+                    self.first_adjustments()
+                    self.df_search = self.create_key()
+                    self.df_search = self.agroup_by_key()
+                    self.df_search = self.sort_values_to_df()
+
+                    ...
+                except Exception as erro:
+                    QMessageBox.critical(self.parent, "Erro", f"Erro ao salvar os dados: {erro}")
+            else:
+                QMessageBox.warning(self.parent, "Aviso", "Nenhum dado pesquisado para salvar.")
+        
         
     
     # Função para limpar o status
     def clear_status(self):
         self.progress_bar_process.setValue(0)
         self.label_status_win_one.setText("Nenhum arquivo carregado.")
-
+            
+    def save_to_excel(self, file_path):
+        
+        ...
     
-    def save_to_excel(self, df, file_path):
+    def first_adjustments(self):
+        path_df_sigo = r'./ARQUIVOS/de_para_sigo.csv'
 
+        df_sigo = pd.read_csv(path_df_sigo, sep=';', encoding='latin1', low_memory=False)
+        df_sigo['ANO_TABELA'] = df_sigo['ANO_TABELA'].astype(str).str.replace('.0', '').str.zfill(8)
+
+        print(f'Quantidade de linhas e colunas: {self.df_search.shape}')
+        self.df_search['TABELA'] = self.df_search['TABELA'].astype(str).str.replace('.0', '').str.zfill(8)
+        self.df_search['NM_PROCEDIMENTO'] = self.df_search['NM_PROCEDIMENTO'].astype(str).str.replace(';', ',')
+        self.df_search['NM_PROCEDIMENTO_TUSS'] = self.df_search['NM_PROCEDIMENTO_TUSS'].astype(str).str.replace(';', ', ')
+
+        # Criando um dicionário de mapeamento a partir de df_sigo
+        map_dict = dict(zip(df_sigo['ANO_TABELA'], df_sigo['DESCRICAO']))
+        # Substituindo os valores em df_ppp['TABELA'] com base no dicionário
+        self.df_search['DESCRICAO'] = self.df_search['TABELA'].map(map_dict).fillna(self.df_search['TABELA'])
+        # Mostrando as primeiras linhas para verificar
+        print(self.df_search['DESCRICAO'].value_counts())
+        # filtrando as colunas e ordenando
+        # print(self.df_search.columns)
+        colum_filter_ordeby = ['CD_PROTOCOLO', 'TABELA', 'DESCRICAO', 'LOCAL_CAPA', 'CD_PROCEDIMENTO', 'CD_PROCEDIMENTO_TUSS',
+            'NM_PROCEDIMENTO', 'NM_PROCEDIMENTO_TUSS', 'NU_ORDEM_PACOTE',
+            'CD_TIPO_ACOMODACAO', 'URG_ELE_TAX_MAT_MED_CIR_ANE_AUX', 'VALOR',
+            'CD_TIPO_REDE_ATENDIMENTO',]
+        #print(self.df_search.columns)
+        self.df_search = self.df_search[colum_filter_ordeby].copy()
+        print(f'Quantidade de linhas e colunas após os ajustes: {self.df_search.shape}')
+        print(self.df_search.head())  # Exibe as primeiras linhas do DataFrame ajustado
+
+    def create_key(self):
+        # Copiando o DataFrame para evitar alterações no original
+        df_copy = self.df_search.copy()
+        # Criando uma chave única
+        df_copy['CHAVE'] = (
+            df_copy.CD_PROTOCOLO.astype(str) + '@' +
+            df_copy.TABELA.astype(str) + '@' +
+            df_copy.DESCRICAO.astype(str) + '@' +
+            df_copy.LOCAL_CAPA.astype(str) + '@' +
+            df_copy.CD_PROCEDIMENTO.astype(str) + '@' +
+            df_copy.CD_PROCEDIMENTO_TUSS.astype(str) + '@' +
+            df_copy.NM_PROCEDIMENTO.astype(str) + '@' +
+            df_copy.NM_PROCEDIMENTO_TUSS.astype(str) + '@' +
+            df_copy.NU_ORDEM_PACOTE.astype(str) + '@' +
+            df_copy.CD_TIPO_ACOMODACAO.astype(str) + '@' +
+            df_copy.URG_ELE_TAX_MAT_MED_CIR_ANE_AUX.astype(str) + '@' +
+            df_copy.VALOR.astype(str)
+        )
+        # Mostrando as colunas do DataFrame
+        print(f'Colunas do DataFrame: \n {df_copy.columns}')
+        # Mostrando as primeiras linhas do DataFrame copiado
+        print(f'Quantidade de linhas e colunas do DataFrame copiado: {df_copy.shape}')
+        # Filtrando somente as colunas que desejamos
+        columns_to_show = ['CHAVE', 'CD_TIPO_REDE_ATENDIMENTO']
+        df_copy = df_copy[columns_to_show].copy()
+        df_copy.drop_duplicates(inplace=True)
+        df_copy.reset_index(drop=True, inplace=True)
+        #ordenando por CD_TIPO_REDE_ATENDIMENTO
+        df_copy.sort_values(by=['CD_TIPO_REDE_ATENDIMENTO'], inplace=True)
+
+        df_copy['CD_TIPO_REDE_ATENDIMENTO'] = df_copy['CD_TIPO_REDE_ATENDIMENTO'].astype(str).str.replace('.0', '')
+
+        print(df_copy.head(3))  # Exibe as primeiras linhas do DataFrame copiado
+
+        return df_copy
         ...
 
+    def agroup_by_key(self):
+        df_copy = self.df_search.copy()
+        # horizontalizando os valores de CD_TIPO_REDE_ATENDIMENTO
+        # Agrupando e criando as colunas horizontalizadas e de quantidade
+        df_copy = (
+            df_copy.groupby('CHAVE')['CD_TIPO_REDE_ATENDIMENTO']
+            .agg([
+                ('CD_TIPO_REDE_ATENDIMENTO', lambda x: ', '.join(sorted(set(x)))),
+                ('QUANTIDADE_REDES', 'nunique')
+            ])
+            .reset_index()
+        )
+        # coçunas selecionas
+        columns_to_show = ['CHAVE', 'QUANTIDADE_REDES', 'CD_TIPO_REDE_ATENDIMENTO']
+        df_copy = df_copy[columns_to_show].copy()
+        df_copy.drop_duplicates(inplace=True)
+        df_copy.reset_index(drop=True, inplace=True)
+        # Separando as colunas novamente agora
+        df_copy[['CD_PROTOCOLO', 'TABELA', 'DESCRICAO', 'LOCAL_CAPA', 'CD_PROCEDIMENTO',
+            'CD_PROCEDIMENTO_TUSS', 'NM_PROCEDIMENTO', 'NM_PROCEDIMENTO_TUSS',
+            'NU_ORDEM_PACOTE', 'CD_TIPO_ACOMODACAO',
+            'URG_ELE_TAX_MAT_MED_CIR_ANE_AUX', 'VALOR',]] = df_copy['CHAVE'].str.split('@', expand=True)
+        # ordenando as colunas
+        colum_filter_ordeby = ['TABELA', 'DESCRICAO', 'LOCAL_CAPA', 'CD_PROCEDIMENTO',
+            'CD_PROCEDIMENTO_TUSS', 'NM_PROCEDIMENTO', 'NM_PROCEDIMENTO_TUSS',
+            'NU_ORDEM_PACOTE', 'CD_TIPO_ACOMODACAO',
+            'URG_ELE_TAX_MAT_MED_CIR_ANE_AUX', 'VALOR', 'QUANTIDADE_REDES',
+            'CD_TIPO_REDE_ATENDIMENTO',]
+        df_copy = df_copy[colum_filter_ordeby].copy()
+
+        print(df_copy.head(3))  # Exibe as primeiras linhas do DataFrame copiado
+
+        return df_copy
+    
+    def sort_values_to_df(self):
+        df_copy = self.df_search.copy()
+        # renomeando as colunas
+        df_copy.rename(columns={'CD_TIPO_REDE_ATENDIMENTO': 'REDES', }, inplace=True)
+
+        df_copy.sort_values(by=['NU_ORDEM_PACOTE', 'VALOR', 'QUANTIDADE_REDES'], inplace=True)
+        df_copy.reset_index(drop=True, inplace=True)
+
+        print(f'Quantidade de linhas e colunas do DataFrame copiado removendo as duplicadas: {df_copy.shape}')
+
+        print(df_copy.head(3))  # Exibe as primeiras linhas do DataFrame copiado
+        
+        return df_copy
 
 
 class SearchWindow(QDialog):
@@ -165,7 +298,7 @@ class SearchWindow(QDialog):
         self.table = QTableWidget()
         self.table.setColumnCount(15)  # Define 15 colunas
         self.table.setHorizontalHeaderLabels(
-            ['TABELA', 'LOCAL_CAPA', 'CD_PROCEDIMENTO', 'CD_PROCEDIMENTO_TUSS',
+            ['CD_PROTOCOLO','TABELA', 'LOCAL_CAPA', 'CD_PROCEDIMENTO', 'CD_PROCEDIMENTO_TUSS',
             'NM_PROCEDIMENTO', 'NM_PROCEDIMENTO_TUSS', 'NU_ORDEM_PACOTE',
             'CD_TIPO_ACOMODACAO', 'URG_ELE_TAX_MAT_MED_CIR_ANE_AUX', 'VALOR',
             'CD_TIPO_REDE_ATENDIMENTO']
@@ -233,7 +366,8 @@ class SearchWindow(QDialog):
                     QMessageBox.warning(self, 'Aviso', f'Protocolo(s): ( {protocol} ) inelegível para automatização de documentos. \n\nSolicita-se verificação com a coordenação.')
 
             except Exception as erro:
-                QMessageBox.critical(self, "Erro", f"Erro ao buscar dados:\n{str(erro)}")
+                QMessageBox.warning(self, 'Aviso', f'Protocolo(s): ( {search_term} ) inelegível para automatização de documentos. \n\nSolicita-se verificação com a coordenação.')
+                #QMessageBox.critical(self, "Erro", f"Erro ao buscar dados:\n{str(erro)}")
         else:
             QMessageBox.warning(self, "Aviso", "Digite um termo para pesquisar!")
 
