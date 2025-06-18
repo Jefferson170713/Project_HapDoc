@@ -6,7 +6,8 @@ from PyQt5.QtWidgets import QWidget
 from PyQt5.QtGui import QIcon
 
 from PyQt5.QtWidgets import QWidget
-from WindowProcedurePackage import WindowProcedurePackage
+#from WindowProcedurePackage import WindowProcedurePackage
+from PackageToProcedureWindow import PackageToProcedureWindow
 from WindowCenterClinic import WindowCenterClinic
 from ServiceWindow import ServicesWindow
 
@@ -23,7 +24,8 @@ class HapDoc(QMainWindow):
         self.center_clinic = QWidget()
         self.service = QWidget()
         # Instanciando a classe ProcedurePackageProcess
-        self.procedure_package_process = WindowProcedurePackage(parent=self)
+        #self.procedure_package_process = WindowProcedurePackage(parent=self)
+        self.procedure_package_process = PackageToProcedureWindow(parent=self)
         self.center_clinic_process = WindowCenterClinic(parent=self)
         self.services_process = ServicesWindow(parent=self)
 
@@ -39,7 +41,7 @@ class HapDoc(QMainWindow):
         self.program_hapdoc.setDocumentMode(True)
         self.program_hapdoc.setMovable(True)
         # Criando a aba "Pacote Procedimento"
-        self.procedure_package_process.create_procedures_and_package_tab(self.procedures_package)
+        self.procedure_package_process.create_window_packagetoprocedure(self.procedures_package)
         self.center_clinic_process.create_center_clinic_tab(self.center_clinic)
         self.services_process.create_window_services(self.service)
 
