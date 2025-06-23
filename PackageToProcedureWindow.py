@@ -102,6 +102,7 @@ class PackageToProcedureWindow:
     
     # Função para processar e salvar o arquivo
     def process_and_save(self):
+        # pede ao usuário para selecionar a pasta de destino
         folder = QFileDialog.getExistingDirectory(self.parent, "Selecione a pasta de destino")
         if folder:
             if not self.df_search.empty:
@@ -118,7 +119,7 @@ class PackageToProcedureWindow:
                     self.df_search = self.create_key()
                     self.df_search = self.agroup_by_key()
                     self.df_search = self.sort_values_to_df()
-
+                    self.save_to_excel(folder)
                     ...
                 except Exception as erro:
                     QMessageBox.critical(self.parent, "Erro", f"Erro ao salvar os dados: {erro}")
@@ -133,7 +134,9 @@ class PackageToProcedureWindow:
         self.label_status_win_one.setText("Nenhum arquivo carregado.")
             
     def save_to_excel(self, file_path):
-        
+        name_protocolo = self.df_search['CD_PROTOCOLO'].iloc[0]
+        sheet_name = 'PACOTE POR PROCEDIMENTO ' + str(name_protocolo)
+        print(f'Sheet name: {sheet_name}')
         ...
     
     def first_adjustments(self):
@@ -224,7 +227,7 @@ class PackageToProcedureWindow:
             'NU_ORDEM_PACOTE', 'CD_TIPO_ACOMODACAO',
             'URG_ELE_TAX_MAT_MED_CIR_ANE_AUX', 'VALOR',]] = df_copy['CHAVE'].str.split('@', expand=True)
         # ordenando as colunas
-        colum_filter_ordeby = ['TABELA', 'DESCRICAO', 'LOCAL_CAPA', 'CD_PROCEDIMENTO',
+        colum_filter_ordeby = ['CD_PROTOCOLO','TABELA', 'DESCRICAO', 'LOCAL_CAPA', 'CD_PROCEDIMENTO',
             'CD_PROCEDIMENTO_TUSS', 'NM_PROCEDIMENTO', 'NM_PROCEDIMENTO_TUSS',
             'NU_ORDEM_PACOTE', 'CD_TIPO_ACOMODACAO',
             'URG_ELE_TAX_MAT_MED_CIR_ANE_AUX', 'VALOR', 'QUANTIDADE_REDES',
@@ -244,7 +247,7 @@ class PackageToProcedureWindow:
         df_copy.reset_index(drop=True, inplace=True)
 
         print(f'Quantidade de linhas e colunas do DataFrame copiado removendo as duplicadas: {df_copy.shape}')
-
+        print(df_copy.columns)  # Exibe as colunas do DataFrame copiado
         print(df_copy.head(3))  # Exibe as primeiras linhas do DataFrame copiado
         
         return df_copy
