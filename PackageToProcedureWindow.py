@@ -133,32 +133,34 @@ class PackageToProcedureWindow:
         self.progress_bar_process.setValue(0)
         self.label_status_win_one.setText("Nenhum arquivo carregado.")
             
+
     def save_to_excel(self, file_path):
-        # pegando o nome do protocolo
+    # pegando o nome do protocolo
         name_protocolo = self.df_search['CD_PROTOCOLO'].iloc[0]
-
-        #print(f'Sheet name: {sheet_name}')
-
         df = self.df_search.copy()
         for nu_ordem in df.NU_ORDEM_PACOTE.unique():
-
             df_copy = df[df.NU_ORDEM_PACOTE == nu_ordem].copy()
-            # definindo o nome do arquivo em excel
-            sheet_name = 'PROCEDIMENTO ' + str(name_protocolo) + ' ' + nu_ordem + '.xlsx'
-            # definindo o caminho do arquivo
-            output_file = os.path.join(file_path, sheet_name)
-            # criando uma cópia do DataFrame filtrando pelo NU_ORDEM_PACOTE
+            # nome do arquivo Excel
+            sheet_file_name = 'PROCEDIMENTO ' + str(name_protocolo) + ' ' + str(nu_ordem) + '.xlsx'
+            output_file = os.path.join(file_path, sheet_file_name)
             columns_to_show = ['TABELA', 'DESCRICAO', 'LOCAL_CAPA', 'CD_PROCEDIMENTO','CD_PROCEDIMENTO_TUSS', 'NM_PROCEDIMENTO', 'NM_PROCEDIMENTO_TUSS',
                 'NU_ORDEM_PACOTE', 'CD_TIPO_ACOMODACAO','URG_ELE_TAX_MAT_MED_CIR_ANE_AUX', 'VALOR', 'QUANTIDADE_REDES','REDES']
-                
+            df_copy = df_copy[columns_to_show].copy()
             with pd.ExcelWriter(output_file, engine='openpyxl') as writer:
-                df_copy = df_copy[columns_to_show].copy()
                 if df_copy.URG_ELE_TAX_MAT_MED_CIR_ANE_AUX.nunique() > 1:
                     print(f'NU_ORDEM_PACOTE: {nu_ordem} possui mais de uma URG_ELE_TAX_MAT_MED_CIR_ANE_AUX')
-                #print(f'Parte final de salvar')
-                #print(df_copy.head(3))  
-                df_copy.to_excel(writer, sheet_name=sheet_name, index=False)
-        
+                    # Cria uma aba para cada valor diferente
+                    for num, valor in enumerate(df_copy.URG_ELE_TAX_MAT_MED_CIR_ANE_AUX.unique()):
+                        aba_nome = f'NEGOCIACAO_{str(num + 1)}'
+                        # Garante que o nome da aba não passe de 31 caracteres
+                        aba_nome = aba_nome[:31]
+                        df_valor = df_copy[df_copy.URG_ELE_TAX_MAT_MED_CIR_ANE_AUX == valor]
+                        df_valor.to_excel(writer, sheet_name=aba_nome, index=False)
+                else:
+                    # Nome da aba padrão
+                    aba_nome = f'PROCEDIMENTO_{str(nu_ordem)}'
+                    aba_nome = aba_nome[:31]
+                    df_copy.to_excel(writer, sheet_name=aba_nome, index=False)
         print(f'Arquivo(s) salvo(s) com sucesso na pasta: {file_path}')
 
     
@@ -270,11 +272,17 @@ class PackageToProcedureWindow:
         df_copy.reset_index(drop=True, inplace=True)
         # covertendo a colunas de valores inteiros
         df_copy['TABELA'] = df_copy['TABELA'].astype(int)
+        print(f'TABELA: OK')
         df_copy['LOCAL_CAPA'] = df_copy['LOCAL_CAPA'].astype(int)
+        print(f'LOCAL_CAPA: OK')
         df_copy['CD_PROCEDIMENTO'] = df_copy['CD_PROCEDIMENTO'].astype(int)
+        print(f'CD_PROCEDIMENTO: OK')
         df_copy['CD_PROCEDIMENTO_TUSS'] = df_copy['CD_PROCEDIMENTO_TUSS'].astype(int)
+        print(f'CD_PROCEDIMENTO_TUSS: OK')
         df_copy['NU_ORDEM_PACOTE'] = df_copy['NU_ORDEM_PACOTE'].astype(int)
+        print(f'NU_ORDEM_PACOTE: OK')
         df_copy['CD_TIPO_ACOMODACAO'] = df_copy['CD_TIPO_ACOMODACAO'].astype(int)
+        print(f'CD_TIPO_ACOMODACAO: OK')
 
         print(f'Quantidade de linhas e colunas do DataFrame copiado removendo as duplicadas: {df_copy.shape}')
         print(df_copy.columns)  # Exibe as colunas do DataFrame copiado
