@@ -134,10 +134,33 @@ class PackageToProcedureWindow:
         self.label_status_win_one.setText("Nenhum arquivo carregado.")
             
     def save_to_excel(self, file_path):
+        # pegando o nome do protocolo
         name_protocolo = self.df_search['CD_PROTOCOLO'].iloc[0]
-        sheet_name = 'PACOTE POR PROCEDIMENTO ' + str(name_protocolo)
-        print(f'Sheet name: {sheet_name}')
-        ...
+
+        #print(f'Sheet name: {sheet_name}')
+
+        df = self.df_search.copy()
+        for nu_ordem in df.NU_ORDEM_PACOTE.unique():
+
+            df_copy = df[df.NU_ORDEM_PACOTE == nu_ordem].copy()
+            # definindo o nome do arquivo em excel
+            sheet_name = 'PACOTE ' + str(name_protocolo) + ' ' + nu_ordem + '.xlsx'
+            # definindo o caminho do arquivo
+            output_file = os.path.join(file_path, sheet_name)
+            # criando uma cópia do DataFrame filtrando pelo NU_ORDEM_PACOTE
+            columns_to_show = ['TABELA', 'DESCRICAO', 'LOCAL_CAPA', 'CD_PROCEDIMENTO','CD_PROCEDIMENTO_TUSS', 'NM_PROCEDIMENTO', 'NM_PROCEDIMENTO_TUSS',
+                'NU_ORDEM_PACOTE', 'CD_TIPO_ACOMODACAO','URG_ELE_TAX_MAT_MED_CIR_ANE_AUX', 'VALOR', 'QUANTIDADE_REDES','REDES']
+                
+            with pd.ExcelWriter(output_file, engine='openpyxl') as writer:
+                df_copy = df_copy[columns_to_show].copy()
+                if df_copy.URG_ELE_TAX_MAT_MED_CIR_ANE_AUX.nunique() > 1:
+                    print(f'NU_ORDEM_PACOTE: {nu_ordem} possui mais de uma URG_ELE_TAX_MAT_MED_CIR_ANE_AUX')
+                #print(f'Parte final de salvar')
+                #print(df_copy.head(3))  
+                df_copy.to_excel(writer, sheet_name=sheet_name, index=False)
+        
+        print(f'Arquivo(s) salvo(s) com sucesso na pasta: {file_path}')
+
     
     def first_adjustments(self):
         path_df_sigo = r'./ARQUIVOS/de_para_sigo.csv'
