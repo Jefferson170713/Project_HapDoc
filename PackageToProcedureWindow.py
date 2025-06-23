@@ -144,7 +144,7 @@ class PackageToProcedureWindow:
 
             df_copy = df[df.NU_ORDEM_PACOTE == nu_ordem].copy()
             # definindo o nome do arquivo em excel
-            sheet_name = 'PACOTE ' + str(name_protocolo) + ' ' + nu_ordem + '.xlsx'
+            sheet_name = 'PROCEDIMENTO ' + str(name_protocolo) + ' ' + nu_ordem + '.xlsx'
             # definindo o caminho do arquivo
             output_file = os.path.join(file_path, sheet_name)
             # criando uma cópia do DataFrame filtrando pelo NU_ORDEM_PACOTE
@@ -268,6 +268,13 @@ class PackageToProcedureWindow:
 
         df_copy.sort_values(by=['NU_ORDEM_PACOTE', 'VALOR', 'QUANTIDADE_REDES'], inplace=True)
         df_copy.reset_index(drop=True, inplace=True)
+        # covertendo a colunas de valores inteiros
+        df_copy['TABELA'] = df_copy['TABELA'].astype(int)
+        df_copy['LOCAL_CAPA'] = df_copy['LOCAL_CAPA'].astype(int)
+        df_copy['CD_PROCEDIMENTO'] = df_copy['CD_PROCEDIMENTO'].astype(int)
+        df_copy['CD_PROCEDIMENTO_TUSS'] = df_copy['CD_PROCEDIMENTO_TUSS'].astype(int)
+        df_copy['NU_ORDEM_PACOTE'] = df_copy['NU_ORDEM_PACOTE'].astype(int)
+        df_copy['CD_TIPO_ACOMODACAO'] = df_copy['CD_TIPO_ACOMODACAO'].astype(int)
 
         print(f'Quantidade de linhas e colunas do DataFrame copiado removendo as duplicadas: {df_copy.shape}')
         print(df_copy.columns)  # Exibe as colunas do DataFrame copiado
