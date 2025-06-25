@@ -16,6 +16,7 @@ from PyQt5.QtWidgets import QTableWidgetItem
 from PyQt5.QtWidgets import QScrollArea
 from PyQt5.QtWidgets import QWidget
 from PyQt5.QtWidgets import QTextEdit
+from PyQt5.QtWidgets import QCheckBox
 import os
 #from SearchWindow import SearchWindow
 from ARQUIVOS.Oracle_Jdbc.jdbc_servicos import JdbcPermission 
@@ -310,6 +311,21 @@ class SearchWindow(QDialog):
         self.progress_bar_process_search.setMaximum(100)
         main_layout.addWidget(self.progress_bar_process_search)
 
+        # --- Adicionando os 5 checkboxes em uma linha ---
+        checkbox_layout = QHBoxLayout()
+        self.checkbox1 = QCheckBox('HAPVIDA')
+        self.checkbox2 = QCheckBox('CCG')
+        self.checkbox3 = QCheckBox('CLINIPAM')
+        self.checkbox4 = QCheckBox('NDI MINAS')
+        self.checkbox5 = QCheckBox('NDI SAUDE')
+        checkbox_layout.addWidget(self.checkbox1)
+        checkbox_layout.addWidget(self.checkbox2)
+        checkbox_layout.addWidget(self.checkbox3)
+        checkbox_layout.addWidget(self.checkbox4)
+        checkbox_layout.addWidget(self.checkbox5)
+        main_layout.addLayout(checkbox_layout)
+        # -----------------------------------------------
+
         self.label_status = QLabel("Status: Nenhuma pesquisa realizada.")
         main_layout.addWidget(self.label_status)
 
@@ -373,12 +389,31 @@ class SearchWindow(QDialog):
                 # Instancia a classe JdbcPermission
                 jdbc_permission = JdbcPermission(path_drive)
 
+                # pegando os valores dos checkboxes
+                list_empresa = []
+                if self.checkbox1.isChecked():
+                    list_empresa.append(1)
+                if self.checkbox2.isChecked():
+                    list_empresa.append(8)
+                if self.checkbox3.isChecked():
+                    list_empresa.append(9)
+                if self.checkbox4.isChecked():
+                    list_empresa.append(10)
+                if self.checkbox5.isChecked():
+                    list_empresa.append(14)
+                if not list_empresa:
+                    list_empresa = '14'
+                else:
+                    list_empresa = ', '.join(map(str, list_empresa))
+                # Exibe os valores selecionados
+                print(f'Lista das empresas: {list_empresa}')
+                print(f'Lista das empresas tipo: {type(list_empresa)}')
+
                 # Usa o método fetch_data para buscar os dados
-                self.df_search, protocol = jdbc_permission.fetch_data(search_term, chunk_size=50000, progress_bar=self.progress_bar_process_search)
+                self.df_search, protocol = jdbc_permission.fetch_data(search_term, chunk_size=50000, progress_bar=self.progress_bar_process_search, list_empresa_plano=list_empresa)
 
                 self.label_status.setText(f"{len(self.df_search)} linhas carregadas.")
-                # Atualiza o self.df_search com os dados encontrados
-                #self.df_search = df
+                
 
                 # Define o número de linhas e colunas da tabela com base no DataFrame
                 self.table.setRowCount(len(self.df_search))
