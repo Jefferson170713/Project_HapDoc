@@ -9,8 +9,8 @@ from PyQt5.QtWidgets import QWidget
 #from WindowProcedurePackage import WindowProcedurePackage
 from PackageToProcedureWindow import PackageToProcedureWindow
 from WindowCenterClinic import WindowCenterClinic
-from ServiceWindow import ServicesWindow
-
+# from ServiceWindow import ServicesWindow
+from ServiceWindow_2 import ServicesWindow
 
 # Classe principal da aplicação
 class HapDoc(QMainWindow):
