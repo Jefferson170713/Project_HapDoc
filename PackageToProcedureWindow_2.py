@@ -135,38 +135,6 @@ class PackageToProcedureWindow:
         self.label_status_win_one.setText("Nenhum arquivo carregado.")
             
 
-    # def save_to_excel(self, file_path):
-    #     #import openpyxl
-    #     name_protocolo = self.df_search['CD_PROTOCOLO'].iloc[0]
-    #     df = self.df_search.copy()
-    #     columns_to_show = [
-    #         'TABELA', 'DESCRICAO', 'LOCAL_CAPA', 'CD_PROCEDIMENTO', 'CD_PROCEDIMENTO_TUSS',
-    #         'NM_PROCEDIMENTO', 'NM_PROCEDIMENTO_TUSS', 'NU_ORDEM_PACOTE', 'CD_TIPO_ACOMODACAO',
-    #         'URG_ELE_TAX_MAT_MED_CIR_ANE_AUX', 'VALOR', 'QUANTIDADE_REDES', 'REDES'
-    #     ]
-    #     # fazendo a barra de progresso crescer de acordo com a quantidade de NU_ORDEM_PACOTE
-        
-    #     for nu_ordem in df.NU_ORDEM_PACOTE.unique():
-    #         # fazendo a barra de progresso crescer de 
-    #         df_copy = df[df.NU_ORDEM_PACOTE == nu_ordem].copy()
-    #         sheet_file_name = 'PROCEDIMENTO ' + str(name_protocolo) + ' ' + str(nu_ordem) + '.xlsx'
-    #         output_file = os.path.join(file_path, sheet_file_name)
-    #         df_copy = df_copy[columns_to_show].copy()
-
-    #         # Sempre salva a aba GERAL_{nu_ordem} primeiro
-    #         with pd.ExcelWriter(output_file, engine='openpyxl') as writer:
-    #             aba_geral = f'GERAL {nu_ordem}'[:31]
-    #             df_copy.to_excel(writer, sheet_name=aba_geral, index=False)
-
-    #             # Se houver mais de uma negociação, cria abas separadas
-    #             if df_copy.URG_ELE_TAX_MAT_MED_CIR_ANE_AUX.nunique() > 1:
-    #                 print(f'NU_ORDEM_PACOTE: {nu_ordem} possui mais de uma URG_ELE_TAX_MAT_MED_CIR_ANE_AUX')
-    #                 for num, valor in enumerate(df_copy.URG_ELE_TAX_MAT_MED_CIR_ANE_AUX.unique()):
-    #                     aba_nome = f'NEGOCIACAO_{num + 1}'[:31]
-    #                     df_valor = df_copy[df_copy.URG_ELE_TAX_MAT_MED_CIR_ANE_AUX == valor]
-    #                     df_valor.to_excel(writer, sheet_name=aba_nome, index=False)
-    #     print(f'Arquivo(s) salvo(s) com sucesso na pasta: {file_path}')
-
     def save_to_excel(self, file_path):
         name_protocolo = self.df_search['CD_PROTOCOLO'].iloc[0]
         df = self.df_search.copy()
@@ -310,6 +278,8 @@ class PackageToProcedureWindow:
         # covertendo a colunas de valores inteiros
         df_copy['TABELA'] = df_copy['TABELA'].astype(int)
         print(f'TABELA: OK')
+        # convertendo valores None de df_copy['LOCAL_CAPA']
+        df_copy['LOCAL_CAPA'] = df_copy['LOCAL_CAPA'].str.replace('None', '0')
         df_copy['LOCAL_CAPA'] = df_copy['LOCAL_CAPA'].astype(int)
         print(f'LOCAL_CAPA: OK')
         df_copy['CD_PROCEDIMENTO'] = df_copy['CD_PROCEDIMENTO'].astype(int)
