@@ -438,8 +438,27 @@ class SearchWindow(QDialog):
                 # Instancia a classe JdbcPermission
                 jdbc_permission = JdbcPermission(path_drive)
 
+                # pegando os valores dos checkboxes
+                list_empresa = []
+                if self.checkbox1.isChecked():
+                    list_empresa.append(1)
+                if self.checkbox2.isChecked():
+                    list_empresa.append(8)
+                if self.checkbox3.isChecked():
+                    list_empresa.append(9)
+                if self.checkbox4.isChecked():
+                    list_empresa.append(10)
+                if self.checkbox5.isChecked():
+                    list_empresa.append(14)
+                if not list_empresa:
+                    list_empresa = '14'
+                else:
+                    list_empresa = ', '.join(map(str, list_empresa))
+                # Exibe os valores selecionados
+                print(f'Lista das empresas: {list_empresa}')
+
                 # Usa o método fetch_data para buscar os dados
-                self.df_search, protocol = jdbc_permission.fetch_data(search_term, chunk_size=50000, progress_bar=self.progress_bar_process_search)
+                self.df_search, protocol = jdbc_permission.fetch_data(search_term, chunk_size=50000, progress_bar=self.progress_bar_process_search, list_empresa_plano=list_empresa)
 
                 self.label_status.setText(f"{len(self.df_search)} linhas carregadas.")
                 # Atualiza o self.df_search com os dados encontrados

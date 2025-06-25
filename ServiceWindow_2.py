@@ -407,7 +407,7 @@ class SearchWindow(QDialog):
                     list_empresa = ', '.join(map(str, list_empresa))
                 # Exibe os valores selecionados
                 print(f'Lista das empresas: {list_empresa}')
-                print(f'Lista das empresas tipo: {type(list_empresa)}')
+                #print(f'Lista das empresas tipo: {type(list_empresa)}')
 
                 # Usa o método fetch_data para buscar os dados
                 self.df_search, protocol = jdbc_permission.fetch_data(search_term, chunk_size=50000, progress_bar=self.progress_bar_process_search, list_empresa_plano=list_empresa)
