@@ -7,7 +7,8 @@ from PyQt5.QtGui import QIcon
 
 from PyQt5.QtWidgets import QWidget
 #from WindowProcedurePackage import WindowProcedurePackage
-from PackageToProcedureWindow import PackageToProcedureWindow
+#from PackageToProcedureWindow import PackageToProcedureWindow
+from PackageToProcedureWindow_2 import PackageToProcedureWindow
 from WindowCenterClinic import WindowCenterClinic
 # from ServiceWindow import ServicesWindow
 from ServiceWindow_2 import ServicesWindow
