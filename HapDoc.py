@@ -1,11 +1,11 @@
 import sys
-from PyQt5.QtWidgets import QApplication
-from PyQt5.QtWidgets import QMainWindow
-from PyQt5.QtWidgets import QTabWidget
-from PyQt5.QtWidgets import QWidget
-from PyQt5.QtGui import QIcon
+from PyQt5.QtWidgets import QApplication #type: ignore
+from PyQt5.QtWidgets import QMainWindow #type: ignore
+from PyQt5.QtWidgets import QTabWidget #type: ignore
+from PyQt5.QtWidgets import QWidget #type: ignore
+from PyQt5.QtGui import QIcon #type: ignore
 
-from PyQt5.QtWidgets import QWidget
+from PyQt5.QtWidgets import QWidget #type: ignore
 #from WindowProcedurePackage import WindowProcedurePackage
 #from PackageToProcedureWindow import PackageToProcedureWindow
 from PackageToProcedureWindow_2 import PackageToProcedureWindow

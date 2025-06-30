@@ -117,11 +117,17 @@ class PackageToProcedureWindow:
                     # self.save_to_excel(self.df_search, self.output_path)
                     # QMessageBox.information(self.parent, "Sucesso", f"Dados salvos em: {self.output_path}")
                     self.first_adjustments()
+                    self.progress_bar_process.setValue(18)
                     self.df_search = self.create_key()
+                    self.progress_bar_process.setValue(45)
                     self.df_search = self.agroup_by_key()
+                    self.progress_bar_process.setValue(65)
                     self.df_search = self.sort_values_to_df()
+                    self.progress_bar_process.setValue(85)
                     self.save_to_excel(folder)
-                    ...
+                    self.progress_bar_process.setValue(100)
+                    count_lines = self.df_search.shape[0]
+                    self.label_status_win_one.setText("Quantidade de linhas: " + str(count_lines))
                 except Exception as erro:
                     QMessageBox.critical(self.parent, "Erro", f"Erro ao salvar os dados: {erro}")
             else:
@@ -282,12 +288,16 @@ class PackageToProcedureWindow:
         df_copy['LOCAL_CAPA'] = df_copy['LOCAL_CAPA'].str.replace('None', '0')
         df_copy['LOCAL_CAPA'] = df_copy['LOCAL_CAPA'].astype(int)
         print(f'LOCAL_CAPA: OK')
+        df_copy['CD_PROCEDIMENTO'] = df_copy['CD_PROCEDIMENTO'].astype(str).str.replace('None', '0')
         df_copy['CD_PROCEDIMENTO'] = df_copy['CD_PROCEDIMENTO'].astype(int)
         print(f'CD_PROCEDIMENTO: OK')
+        df_copy['CD_PROCEDIMENTO_TUSS'] = df_copy['CD_PROCEDIMENTO_TUSS'].astype(str).str.replace('None', '0')
         df_copy['CD_PROCEDIMENTO_TUSS'] = df_copy['CD_PROCEDIMENTO_TUSS'].astype(int)
         print(f'CD_PROCEDIMENTO_TUSS: OK')
+        df_copy['NU_ORDEM_PACOTE'] = df_copy['NU_ORDEM_PACOTE'].astype(str).str.replace('None', '0')
         df_copy['NU_ORDEM_PACOTE'] = df_copy['NU_ORDEM_PACOTE'].astype(int)
         print(f'NU_ORDEM_PACOTE: OK')
+        df_copy['CD_TIPO_ACOMODACAO'] = df_copy['CD_TIPO_ACOMODACAO'].astype(str).str.replace('None', '0')
         df_copy['CD_TIPO_ACOMODACAO'] = df_copy['CD_TIPO_ACOMODACAO'].astype(int)
         print(f'CD_TIPO_ACOMODACAO: OK')
 

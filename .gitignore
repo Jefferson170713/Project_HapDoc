@@ -1,5 +1,6 @@
 # Ignorar a máquina virtual Python
 venv/
+venv_hapdoc/
 # env/
 *.pyc
 __pycache__/
